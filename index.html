@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#84C0EC" />
+<title>2026 속초고 교육과정 박람회</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="device" class="device">
+  <div id="app" class="app">
+
+    <!-- ===================== 랜딩(학년 선택 + 로그인) ===================== -->
+    <div id="landing" class="screen">
+      <div class="lp">
+        <div class="lp-top">
+          <div class="lp-title">2026 속초고<br>교육과정 박람회</div>
+          <div class="lp-sub">학년을 선택하고 시작해요!</div>
+        </div>
+        <div class="lp-char">
+          <span class="lp-note-music l-n1">♪</span><span class="lp-note-music l-n2">♬</span>
+          <img src="img/character4.png" alt="속초고 캐릭터" onerror="this.style.display='none'" />
+        </div>
+        <div class="lp-grades" id="lpGrades">
+          <button class="lp-grade" data-grade="1">1학년</button>
+          <button class="lp-grade" data-grade="2">2학년</button>
+        </div>
+        <div class="lp-login" id="lpLogin" hidden>
+          <div class="lp-login-t" id="lpLoginT">2학년 로그인</div>
+          <input class="lp-input" id="lpHak" type="tel" inputmode="numeric" maxlength="5" placeholder="학번 5자리 (예: 20101)" />
+          <input class="lp-input" id="lpName" type="text" placeholder="이름" />
+          <div class="lp-login-err" id="lpErr" hidden></div>
+          <button class="lp-login-btn" id="lpLoginBtn">확인</button>
+          <button class="lp-skip" id="lpSkip">로그인 없이 둘러보기</button>
+          <button class="lp-back" id="lpBack">‹ 학년 다시 선택</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 홈 ===================== -->
+    <div id="home" class="screen" hidden>
+      <!-- 상단 바 -->
+      <div class="topbar">
+        <div class="tb-greet">
+          <span class="tb-hello">반가워요 👋</span>
+          <span class="tb-who" id="homeWho">속초고 학생</span>
+        </div>
+        <div class="tb-actions">
+          <button class="tb-ic" id="goAlarm" aria-label="알림">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span class="tb-dot"></span>
+          </button>
+          <button class="tb-ic" id="goMy" aria-label="MY PAGE">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 히어로 박스: 나의 시간표 -->
+      <button class="hero-card" id="heroTimetable">
+        <div class="hc-info">
+          <span class="hc-badge" id="homeDday">D-DAY</span>
+          <span class="hc-title">나의 시간표 확인</span>
+          <span class="hc-sub">내가 선택한 과목 한눈에</span>
+          <span class="hc-btn">시작하기 <span class="hc-play">▶</span></span>
+        </div>
+        <img class="hc-char" id="homeChar" src="img/character1.png" alt="속초고 수달 캐릭터" onerror="this.style.display='none'" />
+      </button>
+
+      <!-- 본문 -->
+      <div class="hbody">
+        <div class="hbody-h">바로가기</div>
+        <!-- 바로가기 2×2 -->
+        <div class="menu-grid">
+          <button class="m-card" data-go="ebook">
+            <span class="m-ic"><img src="img/book.png" alt="" aria-hidden="true" /></span>
+            <span class="m-tt">E-Book 바로가기</span>
+            <span class="m-sub">전자책 가이드북</span>
+          </button>
+          <button class="m-card" data-go="metaverse">
+            <span class="m-ic"><img src="img/compass.png" alt="" aria-hidden="true" /></span>
+            <span class="m-tt">메타버스 박람회</span>
+            <span class="m-sub">가상 공간 입장</span>
+          </button>
+          <button class="m-card" data-go="curriculum">
+            <span class="m-ic"><img src="img/school.png" alt="" aria-hidden="true" /></span>
+            <span class="m-tt">우리학교 편제표</span>
+            <span class="m-sub">학년별 교육과정</span>
+          </button>
+          <button class="m-card" data-go="schedule">
+            <span class="m-ic"><img src="img/pin.png" alt="" aria-hidden="true" /></span>
+            <span class="m-tt">전체 일정 확인</span>
+            <span class="m-sub">박람회 타임테이블</span>
+          </button>
+        </div>
+
+        <div class="foot">
+          © 2026 속초고등학교 교육과정 박람회 · 사이음(sci_eum)
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 상세(준비중) ===================== -->
+    <div id="detail" class="screen" hidden>
+      <div class="d-top">
+        <button class="d-back" id="detailBack" aria-label="홈으로">‹</button>
+        <div class="d-ttl" id="detailTitle">제목</div>
+        <span class="d-sp"></span>
+      </div>
+      <div class="d-body">
+        <img class="d-char" src="img/character3.png" alt="" onerror="this.style.display='none'" />
+        <div class="d-soon">준비 중인 기능이에요</div>
+        <div class="d-desc">다음 단계에서 이어서 만들 예정이에요.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
