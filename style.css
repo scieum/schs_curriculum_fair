@@ -386,9 +386,11 @@ button{font-family:inherit;}
 /* 우리반 학생 타임별 위치(행렬) */
 #detail .mc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
 #detail .mc-head .mc-note{margin:0;flex:1;}
-#detail .mc-print{flex:none;border:1px solid #cde0b3;background:#fff;color:#4f7d24;
+#detail .mc-print{display:inline-flex;align-items:center;gap:6px;flex:none;
+  border:1px solid #cde0b3;background:#fff;color:#4f7d24;
   border-radius:10px;padding:9px 14px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;
   white-space:nowrap;box-shadow:0 4px 12px rgba(110,150,50,.12);}
+#detail .mc-print .btn-ic{width:17px;height:17px;object-fit:contain;flex:none;}
 #detail .mc-print:active{transform:scale(.97);background:#f7fbef;}
 #detail .mc-wrap{overflow-x:auto;border:1px solid #ece7da;border-radius:14px;background:#fff;
   box-shadow:0 6px 16px rgba(120,100,60,.06);}
