@@ -367,10 +367,52 @@ button{font-family:inherit;}
 #detail .mc-table td .mc-empty{color:#cdbf9d;}
 #detail .mc-table tbody tr:nth-child(even) td{background:#fcfbf7;}
 
-/* PC 반응형: 넓은 화면에서 앱을 더 넓게 + 바로가기 3열 */
-@media (min-width:900px){
-  .device.is-pc .app{max-width:980px;}
-  .device.is-pc #home .hero-card{width:calc(100% - 36px);}
-  .device.is-pc #home .menu-grid{grid-template-columns:repeat(3,1fr);}
-  .device.is-pc #detail .d-body{max-width:960px;margin:0 auto;}
+/* ===================================================================
+   PC 웹 레이아웃 — 모바일 프레임이 아니라 실제 웹사이트처럼
+   =================================================================== */
+@media (min-width:860px){
+  /* 페이지 전체가 자연스럽게 스크롤되도록 */
+  html[data-device="pc"], html[data-device="pc"] body{overflow:auto;height:auto;background:#eef1f4;}
+  .device.is-pc{display:block;width:100%;height:auto;min-height:100dvh;}
+  .device.is-pc .app{width:100%;max-width:none;height:auto;min-height:100dvh;
+    background:#eef1f4;box-shadow:none;overflow:visible;}
+  .device.is-pc .screen{position:static;inset:auto;overflow:visible;min-height:100dvh;}
+
+  /* 콘텐츠 가운데 정렬 폭 */
+  .device.is-pc #home .topbar,
+  .device.is-pc #home .hero-card,
+  .device.is-pc #home .hbody{max-width:1180px;margin-left:auto;margin-right:auto;}
+
+  /* 상단바 = 웹 헤더 */
+  .device.is-pc #home .topbar{padding:24px 32px 14px;}
+  .device.is-pc #home .tb-who{font-size:22px;}
+
+  /* 히어로 = 와이드 배너 */
+  .device.is-pc #home .hero-card{width:auto;margin-top:14px;padding:34px 40px;border-radius:28px;min-height:200px;}
+  .device.is-pc #home .hc-title{font-size:30px;}
+  .device.is-pc #home .hc-sub{font-size:16px;margin-top:8px;}
+  .device.is-pc #home .hc-char{width:190px;margin-bottom:-34px;}
+  .device.is-pc #home .hbody{padding:30px 32px 60px;}
+  .device.is-pc #home .hbody-h{font-size:18px;}
+
+  /* 바로가기 = 대시보드 카드 그리드 (자동 채움) */
+  .device.is-pc #home .menu-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;}
+  .device.is-pc #home .m-card{min-height:170px;padding:24px 22px;transition:transform .12s,box-shadow .12s;}
+  .device.is-pc #home .m-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(120,90,30,.12);background:#fff;}
+
+  /* 상세 = 웹 본문 (헤더는 full-bleed, 내용은 가운데 1180 열에 정렬) */
+  .device.is-pc #detail .d-top{padding-left:max(24px,calc((100% - 1180px)/2));
+    padding-right:max(24px,calc((100% - 1180px)/2));}
+  .device.is-pc #detail .d-ttl{text-align:left;font-size:20px;padding-left:6px;}
+  .device.is-pc #detail .d-body{max-width:1180px;margin-left:auto;margin-right:auto;width:100%;
+    padding:30px 32px 80px;}
+
+  /* 랜딩(로그인)도 웹 화면 가운데 카드처럼 */
+  .device.is-pc #landing{min-height:100dvh;}
+  .device.is-pc #landing .lp{max-width:540px;margin:0 auto;}
+}
+
+/* 아주 넓은 화면: 바로가기 더 넉넉하게 */
+@media (min-width:1280px){
+  .device.is-pc #home .menu-grid{grid-template-columns:repeat(4,1fr);}
 }

@@ -52,6 +52,8 @@
   function show(name) {
     SCREENS.forEach(function (s) { var el = $(s); if (el) el.hidden = (s !== name); });
     var scr = $(name); if (scr) scr.scrollTop = 0;
+    // PC(웹)에서는 페이지(window)가 스크롤되므로 맨 위로
+    if (window.scrollTo) window.scrollTo(0, 0);
   }
 
   /* ---------- 3) 랜딩 / 로그인 ---------- */
