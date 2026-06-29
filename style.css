@@ -388,7 +388,7 @@ button{font-family:inherit;}
   .device.is-pc #home .tb-who{font-size:22px;}
 
   /* 히어로 = 와이드 배너 */
-  .device.is-pc #home .hero-card{width:auto;margin-top:14px;padding:34px 40px;border-radius:28px;min-height:200px;}
+  .device.is-pc #home .hero-card{width:100%;margin-top:14px;padding:34px 40px;border-radius:28px;min-height:200px;}
   .device.is-pc #home .hc-title{font-size:30px;}
   .device.is-pc #home .hc-sub{font-size:16px;margin-top:8px;}
   .device.is-pc #home .hc-char{width:190px;margin-bottom:-34px;}
