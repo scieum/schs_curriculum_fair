@@ -353,9 +353,11 @@ button{font-family:inherit;}
 /* 우리반 학생 타임별 위치(행렬) */
 #detail .mc-wrap{overflow-x:auto;border:1px solid #ece7da;border-radius:14px;background:#fff;
   box-shadow:0 6px 16px rgba(120,100,60,.06);}
-#detail .mc-table{border-collapse:collapse;width:100%;}
+#detail .mc-table{border-collapse:collapse;width:100%;table-layout:fixed;min-width:1080px;}
+/* 7개 열 모두 동일 너비 + 모든 행 동일 높이 */
 #detail .mc-table th,#detail .mc-table td{border:1px solid #efe8d8;padding:6px 8px;
-  text-align:center;vertical-align:middle;font-size:12px;}
+  text-align:center;vertical-align:middle;font-size:12px;width:14.2857%;height:62px;
+  overflow:hidden;word-break:keep-all;}
 #detail .mc-table thead th{background:#2f4a1c;color:#fff;font-weight:700;position:sticky;top:0;z-index:2;white-space:nowrap;}
 #detail .mc-table thead th.mc-corner{left:0;z-index:3;background:#27400f;}
 #detail .mc-table thead th .mc-when{display:block;font-size:9.5px;font-weight:600;opacity:.85;margin-top:2px;}
