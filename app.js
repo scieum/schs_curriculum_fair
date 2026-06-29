@@ -310,15 +310,22 @@
   }
   $("detailBack").addEventListener("click", function () { show("home"); });
 
-  // E-Book: 학생은 본인 학년 책으로 바로, 교사는 학년 선택 화면
+  // E-Book: 학생은 본인 학년 책으로 바로, 교사는 1·2학년을 좌우 2단으로 임베드
+  function ebookCol(grade) {
+    var url = EBOOK[grade];
+    return '<div class="eb-col">'
+      + '<div class="eb-h">' + grade + '학년 E-Book'
+      +   '<a class="eb-open" href="' + url + '" target="_blank" rel="noopener">새 창으로 열기 ↗</a></div>'
+      + '<iframe class="eb-frame" src="' + url + '" loading="lazy" allowfullscreen></iframe>'
+      + '</div>';
+  }
   function openEbook() {
     var grades = viewGrades();
     if (grades.length === 1) { window.open(EBOOK[grades[0]], "_blank", "noopener"); return; }
     $("detailTitle").textContent = "E-Book 바로가기";
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note">학년별 <b>E-Book 가이드북</b>이에요. 학년을 선택하세요.</p>'
-      + '<a class="ag-link" href="' + EBOOK["1"] + '" target="_blank" rel="noopener">📘 1학년 E-Book 열기 ›</a>'
-      + '<a class="ag-link" href="' + EBOOK["2"] + '" target="_blank" rel="noopener">📗 2학년 E-Book 열기 ›</a>';
+      + '<p class="tt-note"><b>1·2학년 E-Book 가이드북</b>을 좌우로 함께 볼 수 있어요.</p>'
+      + '<div class="eb-grid">' + ebookCol("1") + ebookCol("2") + '</div>';
     show("detail");
   }
 

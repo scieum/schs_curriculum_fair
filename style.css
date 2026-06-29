@@ -350,6 +350,21 @@ button{font-family:inherit;}
 #landing .lp-sug-nm{font-size:15px;font-weight:700;color:#36511f;}
 #landing .lp-sug-sub{font-size:12px;font-weight:600;color:#7d965a;}
 
+/* E-Book 2단 임베드 (교사) */
+#detail .eb-grid{display:flex;gap:16px;margin-top:6px;}
+#detail .eb-col{flex:1;min-width:0;display:flex;flex-direction:column;}
+#detail .eb-h{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:14px;font-weight:800;color:#2f4a1c;margin-bottom:8px;}
+#detail .eb-open{font-size:12px;font-weight:700;color:#4f7d24;text-decoration:none;
+  border:1px solid #cde0b3;border-radius:8px;padding:4px 9px;background:#fff;white-space:nowrap;}
+#detail .eb-open:active{background:#f3f8e8;}
+#detail .eb-frame{width:100%;height:74vh;min-height:460px;border:1px solid #e3dcca;
+  border-radius:12px;background:#fff;box-shadow:0 6px 16px rgba(120,100,60,.06);}
+@media (max-width:760px){
+  #detail .eb-grid{flex-direction:column;}
+  #detail .eb-frame{height:62vh;min-height:380px;}
+}
+
 /* 우리반 학생 타임별 위치(행렬) */
 #detail .mc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
 #detail .mc-head .mc-note{margin:0;flex:1;}
