@@ -183,8 +183,12 @@
   };
   // 외부 링크로 바로 연결되는 메뉴
   var LINKS = {
-    metaverse: "https://zep.us/play/mkRW1q",
-    ebook:     "https://example.com/ebook"   // TODO: 실제 E-Book 링크로 교체
+    metaverse: "https://zep.us/play/mkRW1q"
+  };
+  // 학년별 E-Book 가이드북 링크
+  var EBOOK = {
+    "1": "https://ebook.dsummer.co.kr/books/fzfh/#p=1",
+    "2": "https://ebook.dsummer.co.kr/books/nycq/#p=1"
   };
   // 앱에 내장된 페이지(같은 탭 이동, 로그인 세션 공유)
   var PAGES = {
@@ -194,6 +198,7 @@
   document.querySelectorAll(".m-card[data-go]").forEach(function (card) {
     card.addEventListener("click", function () {
       var key = card.dataset.go;
+      if (key === "ebook") { openEbook(); return; }                    // 학년별 분기
       if (PAGES[key]) { window.location.href = PAGES[key]; return; }   // 세션 그대로 이어짐
       if (LINKS[key]) { window.open(LINKS[key], "_blank", "noopener"); return; }
       openDetail(key);
@@ -210,6 +215,18 @@
     show("detail");
   }
   $("detailBack").addEventListener("click", function () { show("home"); });
+
+  // E-Book: 학생은 본인 학년 책으로 바로, 교사는 학년 선택 화면
+  function openEbook() {
+    var grades = viewGrades();
+    if (grades.length === 1) { window.open(EBOOK[grades[0]], "_blank", "noopener"); return; }
+    $("detailTitle").textContent = "E-Book 바로가기";
+    $("detailBody").innerHTML = ''
+      + '<p class="tt-note">학년별 <b>E-Book 가이드북</b>이에요. 학년을 선택하세요.</p>'
+      + '<a class="ag-link" href="' + EBOOK["1"] + '" target="_blank" rel="noopener">📘 1학년 E-Book 열기 ›</a>'
+      + '<a class="ag-link" href="' + EBOOK["2"] + '" target="_blank" rel="noopener">📗 2학년 E-Book 열기 ›</a>';
+    show("detail");
+  }
 
   /* ---------- 나의 시간표 ----------
      6타임(A~F) 구성. 타임별 시간은 공통, 수강 과목은 학생(학번)마다 다름.
