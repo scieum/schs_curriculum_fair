@@ -241,7 +241,7 @@
       menu += menuCard("duty", "calander.png", "임장 일정", "내 감독 시간·장소");
       if (t.homeroom) menu += menuCard("myclass", "compass.png", "우리반 학생 위치", "타임별 이동 현황");
       menu += menuCard("schedule", "pin.png", "전체 일정 확인", "박람회 타임테이블");
-      menu += menuCard("surveyagg", "graph.png", "교과별 신청 인원", "수요조사 집계");
+      menu += menuCard("surveyagg", "excel.png", "교과별 신청 인원", "수요조사 집계");
       menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
       menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
       menu += menuCard("metaverse", "Metaverse.png", "메타버스 박람회", "가상 공간 입장");
@@ -471,7 +471,10 @@
       : 'A~F 타임별 <b>' + grade + '학년 전체 부스</b>와 <b>교실 위치</b>예요. 보기 방식을 골라 확인하세요.';
 
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note">' + note + '</p>'
+      + '<div class="ag-top">'
+      +   '<p class="tt-note ag-top-note">' + note + '</p>'
+      +   '<button class="mc-print ag-xlsx" id="schXlsx"><img class="btn-ic" src="img/excel.png" alt="" aria-hidden="true">엑셀</button>'
+      + '</div>'
       + '<div class="sch-modes" id="schModes">'
       +   '<button class="sch-tab" data-m="list">타임별 목록</button>'
       +   '<button class="sch-tab" data-m="grid">반별 표</button>'
@@ -480,6 +483,7 @@
       + '<div id="schBody"></div>'
       + (isTeacher() ? '<a class="sch-grid-link" href="schedule_all.html">🖨️ 1·2학년 한 페이지로(인쇄용) 열기</a>' : '');
 
+    $("schXlsx").addEventListener("click", function () { downloadSchedule(grade); });
     document.querySelectorAll("#schModes .sch-tab").forEach(function (b) {
       b.addEventListener("click", function () { mode = b.dataset.m; paint(); });
     });
@@ -487,6 +491,26 @@
       b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
     });
     paint();
+  }
+
+  // 전체 일정(반별 표) → CSV(엑셀): 열=교실, 행=A~F 타임
+  function downloadSchedule(grade) {
+    var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
+    var roomset = {};
+    for (var s in ROOMS) for (var t in ROOMS[s]) roomset[ROOMS[s][t]] = 1;
+    var rooms = Object.keys(roomset).sort(function (a, b) { return a.localeCompare(b, "ko", { numeric: true }); });
+    var cell = {};
+    SLOT_LETTERS.forEach(function (L) { cell[L] = {}; });
+    for (var s2 in ROOMS) for (var t2 in ROOMS[s2]) cell[t2][ROOMS[s2][t2]] = s2;
+
+    var rows = [["타임", "시간"].concat(rooms)];
+    for (var i = 0; i < 6; i++) {
+      var L = SLOT_LETTERS[i];
+      var row = [L, TIME_SLOTS[i] || ""];
+      rooms.forEach(function (r) { row.push(cell[L][r] || ""); });
+      rows.push(row);
+    }
+    downloadCsv("전체일정_" + grade + "학년.csv", rows);
   }
 
   /* ---------- 우리학교 편제표 (3개년 교육과정) ----------
@@ -602,7 +626,7 @@
     function dataFor(g) { return (g === "1") ? window.SURVEY1 : window.SURVEY; }
 
     // 교과별 신청 인원(별도 페이지) 바로가기 버튼
-    var aggBtn = '<button class="ag-link" id="goAgg"><img class="ag-link-ic" src="img/graph.png" alt="" aria-hidden="true">교과별 신청 인원 보기 ›</button>';
+    var aggBtn = '<button class="ag-link" id="goAgg"><img class="ag-link-ic" src="img/excel.png" alt="" aria-hidden="true">교과별 신청 인원 보기 ›</button>';
 
     // 교사: 개인 신청 데이터가 없으므로 안내 + 집계 페이지 버튼만
     if (teacher) {
