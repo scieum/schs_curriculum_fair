@@ -79,6 +79,10 @@ button{font-family:inherit;}
   border:1px solid #e0eecb;border-radius:18px;padding:20px;cursor:pointer;font-family:inherit;
   font-size:18px;font-weight:800;color:#36511f;box-shadow:0 8px 20px rgba(110,150,50,.16);}
 #landing .lp-grade:active{transform:scale(.99);background:#fbfdf3;}
+#landing .lp-teacher{display:block;width:100%;margin-top:2px;text-align:center;background:transparent;
+  border:1px dashed #bcd29a;border-radius:14px;padding:13px;cursor:pointer;font-family:inherit;
+  font-size:14px;font-weight:700;color:#5e7a3c;}
+#landing .lp-teacher:active{transform:scale(.99);background:rgba(255,255,255,.5);}
 
 #landing .lp-login{flex:0 0 auto;display:flex;flex-direction:column;gap:10px;}
 #landing .lp-login-t{font-size:15px;font-weight:800;color:#36511f;margin-bottom:2px;}
@@ -287,8 +291,40 @@ button{font-family:inherit;}
 #detail .sv-badge{font-size:14px;font-weight:800;color:#2f4a1c;}
 #detail .sv-cnt{font-size:12px;font-weight:700;color:#8a7c55;}
 #detail .sv-list{list-style:none;margin:0;padding:6px 16px 12px;}
-#detail .sv-item{padding:10px 0;border-top:1px solid #f4efe4;font-size:14.5px;font-weight:700;
+#detail .sv-item{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 0;border-top:1px solid #f4efe4;font-size:14.5px;font-weight:700;
   color:#1f7a3d;letter-spacing:-.2px;}
 #detail .sv-item:first-child{border-top:0;}
+#detail .sv-nm{flex:1;min-width:0;}
+#detail .sv-tags{flex:none;display:flex;align-items:center;gap:5px;}
+#detail .sv-dept{font-size:11.5px;font-weight:700;color:#6b5526;background:#f3efe3;
+  border-radius:8px;padding:3px 8px;white-space:nowrap;}
+#detail .sv-kind{font-size:11.5px;font-weight:800;border-radius:8px;padding:3px 8px;white-space:nowrap;}
+#detail .sv-kind.k-ilban{background:#e7f1d8;color:#4f7d24;}
+#detail .sv-kind.k-jinro{background:#e2eefb;color:#2f6bbf;}
+#detail .sv-kind.k-yung{background:#fdeede;color:#c47b1e;}
+#detail .sv-kind.k-gong{background:#eee;color:#777;}
 #detail .sv-empty{padding:14px 0;color:#a3a3a3;font-size:13.5px;font-weight:600;}
 #detail .sv-none{margin-top:18px;text-align:center;color:#9a895f;font-size:14px;font-weight:600;}
+
+/* ── 교과별 신청 인원(집계) ── */
+#detail .ag-link{display:block;width:100%;margin:16px 0 4px;padding:14px;border:0;border-radius:14px;
+  background:#2f4a1c;color:#fff;font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer;
+  box-shadow:0 8px 18px rgba(47,74,28,.18);}
+#detail .ag-link:active{transform:scale(.99);}
+#detail .ag-back{border:0;background:transparent;color:#6e8a48;font-size:13.5px;font-weight:700;
+  font-family:inherit;cursor:pointer;padding:2px 0 10px;}
+#detail .ag-wrap{display:flex;flex-direction:column;gap:14px;margin-top:4px;}
+#detail .ag-sem{background:#fff;border:1px solid #f1ece0;border-radius:16px;overflow:hidden;
+  box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .ag-table{width:100%;border-collapse:collapse;}
+#detail .ag-table td{padding:9px 12px;border-top:1px solid #f4efe4;vertical-align:middle;}
+#detail .ag-table tr:first-child td{border-top:0;}
+#detail .ag-name{width:48%;}
+#detail .ag-nm{display:block;font-size:13.5px;font-weight:700;color:#2b2310;letter-spacing:-.2px;}
+#detail .ag-name .sv-tags{margin-top:4px;}
+#detail .ag-bar{width:auto;}
+#detail .ag-bar .ag-fill{display:block;height:9px;border-radius:6px;
+  background:linear-gradient(90deg,#9cc56f,#6aa84f);min-width:3px;}
+#detail .ag-cnt{width:1%;white-space:nowrap;text-align:right;font-size:14px;font-weight:800;color:#2f4a1c;}
+#detail .ag-cnt .ag-unit{font-size:11px;font-weight:700;color:#8a7c55;margin-left:1px;}

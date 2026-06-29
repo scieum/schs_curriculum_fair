@@ -13,6 +13,18 @@
   // 박람회 당일 (D-day 기준)
   var EVENT_DATE = "2026-07-10";
 
+  // 교사용 페이지 접속 코드 (필요하면 이 값만 바꾸면 됩니다)
+  var TEACHER_CODE = "2026";
+
+  // 현재 사용자가 교사 모드인지
+  function isTeacher() { return (localStorage.getItem(KEY.grade) || "") === "T"; }
+  // 화면에 보여줄 학년 목록 (학생=본인 학년만 / 교사=1·2학년 모두)
+  function viewGrades() {
+    if (isTeacher()) return ["1", "2"];
+    var g = localStorage.getItem(KEY.grade) || "";
+    return (g === "1" || g === "2") ? [g] : ["1", "2"];
+  }
+
   // 캐릭터(수달) 풀
   var CHARS = ["img/character1.png","img/character2.png","img/character3.png","img/character4.png","img/character5.png"];
 
@@ -61,6 +73,29 @@
     $("lpGrades").hidden = false;
     clearErr();
   });
+
+  /* ---------- 교사용 로그인 (1·2학년 통합 보기) ---------- */
+  function tErr(m) { var e = $("lpTErr"); e.textContent = m; e.hidden = false; }
+  $("lpTeacherBtn").addEventListener("click", function () {
+    $("lpGrades").hidden = true;
+    $("lpTeacher").hidden = false;
+    $("lpTErr").hidden = true;
+    $("lpCode").value = "";
+    $("lpCode").focus();
+  });
+  $("lpTBack").addEventListener("click", function () {
+    $("lpTeacher").hidden = true;
+    $("lpGrades").hidden = false;
+    $("lpTErr").hidden = true;
+  });
+  $("lpTBtn").addEventListener("click", function () {
+    if ($("lpCode").value.trim() !== TEACHER_CODE) { tErr("교사용 코드가 올바르지 않아요."); return; }
+    localStorage.setItem(KEY.grade, "T");
+    localStorage.setItem(KEY.hak, "");
+    localStorage.setItem(KEY.name, "선생님");
+    enterHome("선생님");
+  });
+  $("lpCode").addEventListener("keydown", function (e) { if (e.key === "Enter") $("lpTBtn").click(); });
 
   function clearErr() { var e = $("lpErr"); e.hidden = true; e.textContent = ""; }
   function showErr(m) { var e = $("lpErr"); e.textContent = m; e.hidden = false; }
@@ -141,6 +176,7 @@
   var MENU = {
     timetable:  "나의 시간표 확인",
     survey:     "1차 수요조사 결과",
+    surveyagg:  "교과별 신청 인원",
     metaverse:  "메타버스 박람회 접속",
     curriculum: "우리학교 편제표 확인",
     schedule:   "전체 일정 확인"
@@ -167,6 +203,7 @@
     $("detailTitle").textContent = MENU[key] || "안내";
     if (key === "timetable")   renderTimetable();
     else if (key === "survey") renderSurvey();
+    else if (key === "surveyagg") renderSurveyAgg();
     else if (key === "schedule") renderSchedule();
     else if (key === "curriculum") renderCurriculum();
     else renderSoon();
@@ -286,9 +323,19 @@
       + '</thead><tbody>' + body + '</tbody></table></div>';
   }
 
+  // 학년 탭 HTML (보여줄 학년이 2개 이상일 때만 표시)
+  function gradeTabsHtml(id, grades, cur) {
+    if (grades.length < 2) return "";
+    return '<div class="sch-tabs" id="' + id + '">'
+      + grades.map(function (g) {
+          return '<button class="sch-tab' + (g === cur ? " on" : "") + '" data-g="' + g + '">' + g + '학년</button>';
+        }).join("")
+      + '</div>';
+  }
+
   function renderSchedule() {
-    var grade = localStorage.getItem(KEY.grade) || "1";
-    if (grade !== "1" && grade !== "2") grade = "1";
+    var grades = viewGrades();
+    var grade = grades[0];
     var mode = "list";   // list = 타임별 목록, grid = 반별 표
 
     function paint() {
@@ -301,18 +348,19 @@
       $("schBody").innerHTML = (mode === "grid") ? buildMatrix(grade) : buildScheduleTable(grade);
     }
 
+    var note = isTeacher()
+      ? 'A~F 타임별 <b>전체 부스</b>와 <b>교실 위치</b>예요. 보기 방식과 학년을 골라 확인하세요.'
+      : 'A~F 타임별 <b>' + grade + '학년 전체 부스</b>와 <b>교실 위치</b>예요. 보기 방식을 골라 확인하세요.';
+
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note">A~F 타임별 <b>전체 부스</b>와 <b>교실 위치</b>예요. 보기 방식과 학년을 골라 확인하세요.</p>'
+      + '<p class="tt-note">' + note + '</p>'
       + '<div class="sch-modes" id="schModes">'
       +   '<button class="sch-tab" data-m="list">타임별 목록</button>'
       +   '<button class="sch-tab" data-m="grid">반별 표</button>'
       + '</div>'
-      + '<div class="sch-tabs" id="schTabs">'
-      +   '<button class="sch-tab" data-g="1">1학년</button>'
-      +   '<button class="sch-tab" data-g="2">2학년</button>'
-      + '</div>'
+      + gradeTabsHtml("schTabs", grades, grade)
       + '<div id="schBody"></div>'
-      + '<a class="sch-grid-link" href="schedule_all.html">🖨️ 1·2학년 한 페이지로(인쇄용) 열기</a>';
+      + (isTeacher() ? '<a class="sch-grid-link" href="schedule_all.html">🖨️ 1·2학년 한 페이지로(인쇄용) 열기</a>' : '');
 
     document.querySelectorAll("#schModes .sch-tab").forEach(function (b) {
       b.addEventListener("click", function () { mode = b.dataset.m; paint(); });
@@ -345,8 +393,8 @@
     var data = window.CURRICULUM || null;
     if (!data) { renderSoon(); return; }
 
-    var grade = localStorage.getItem(KEY.grade) || "1";
-    if (grade !== "1" && grade !== "2") grade = "1";
+    var grades = viewGrades();
+    var grade = grades[0];
     var mode = "fit";   // fit = 한눈에(자동 축소), scroll = 원본 크기
 
     function paint() {
@@ -361,16 +409,17 @@
       }
     }
 
+    var pjNote = isTeacher()
+      ? '학년별 <b>3개년 교육과정 편제표</b>예요. (1학년=2026학년도 입학생 · 2학년=2025학년도 입학생)'
+      : '<b>' + grade + '학년 3개년 교육과정 편제표</b>예요. (' + (grade === "1" ? "2026" : "2025") + '학년도 입학생)';
+
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note">학년별 <b>3개년 교육과정 편제표</b>예요. (1학년=2026학년도 입학생 · 2학년=2025학년도 입학생) <b>한눈에 보기</b>는 화면에 맞춰 줄여 보여줘요.</p>'
+      + '<p class="tt-note">' + pjNote + ' <b>한눈에 보기</b>는 화면에 맞춰 줄여 보여줘요.</p>'
       + '<div class="sch-modes" id="pjModes">'
       +   '<button class="sch-tab" data-m="fit">한눈에 보기</button>'
       +   '<button class="sch-tab" data-m="scroll">원본 크기</button>'
       + '</div>'
-      + '<div class="sch-tabs" id="pjTabs">'
-      +   '<button class="sch-tab" data-g="1">1학년</button>'
-      +   '<button class="sch-tab" data-g="2">2학년</button>'
-      + '</div>'
+      + gradeTabsHtml("pjTabs", grades, grade)
       + '<div id="pjBody"></div>';
 
     document.querySelectorAll("#pjModes .sch-tab").forEach(function (b) {
@@ -401,9 +450,21 @@
   /* ---------- 1차 수요조사 결과 (학기별 신청 과목) ----------
      데이터: window.SURVEY1[학번] = { s1:[과목..], s2:[과목..] }  (1학기/2학기)
        아직 데이터 미연동 시 안내 화면을 보여준다. */
-  function semBlock(title, list) {
+  // 선택유형(과목구분) → 칩 class/표시
+  var KIND_CLASS = { "일반": "k-ilban", "진로": "k-jinro", "융합": "k-yung", "공통": "k-gong" };
+  function subjTags(grade, name) {
+    var META = window.SUBJECT_META || {};
+    var m = (META[grade] || {})[name];
+    if (!m) return "";
+    var dept = m.dept ? '<span class="sv-dept">' + esc(m.dept) + '</span>' : "";
+    var kind = m.kind ? '<span class="sv-kind ' + (KIND_CLASS[m.kind] || "") + '">' + esc(m.kind) + '</span>' : "";
+    return '<span class="sv-tags">' + dept + kind + '</span>';
+  }
+  function semBlock(title, list, grade) {
     var items = (list && list.length)
-      ? list.map(function (s) { return '<li class="sv-item">' + esc(s) + '</li>'; }).join("")
+      ? list.map(function (s) {
+          return '<li class="sv-item"><span class="sv-nm">' + esc(s) + '</span>' + subjTags(grade, s) + '</li>';
+        }).join("")
       : '<li class="sv-empty">신청 내역이 없어요</li>';
     return '<div class="sv-sem">'
       + '<div class="sv-sem-h"><span class="sv-badge">' + title + '</span>'
@@ -414,13 +475,27 @@
 
   function renderSurvey() {
     var hak   = localStorage.getItem(KEY.hak) || "";
-    var grade = localStorage.getItem(KEY.grade) || "";
     var name  = localStorage.getItem(KEY.name) || "속초고 학생";
-    var data  = (grade === "1") ? window.SURVEY1 : window.SURVEY;
-    var rec   = (data && data[hak]) ? data[hak] : null;
+    var teacher = isTeacher();
+    var grades = viewGrades();
+    var grade = grades[0];
 
-    // 데이터 자체가 아직 연동되지 않은 경우
-    if (!data) {
+    function dataFor(g) { return (g === "1") ? window.SURVEY1 : window.SURVEY; }
+
+    // 교과별 신청 인원(별도 페이지) 바로가기 버튼
+    var aggBtn = '<button class="ag-link" id="goAgg">📊 교과별 신청 인원 보기 ›</button>';
+
+    // 교사: 개인 신청 데이터가 없으므로 안내 + 집계 페이지 버튼만
+    if (teacher) {
+      $("detailBody").innerHTML = ''
+        + '<p class="tt-note"><b>1차 수요조사</b> 결과예요. 교과별 신청 인원은 아래 버튼에서 확인하세요.</p>'
+        + aggBtn;
+      $("goAgg").addEventListener("click", function () { openDetail("surveyagg"); });
+      return;
+    }
+
+    // 데이터 미연동
+    if (!dataFor(grade)) {
       $("detailBody").innerHTML = ''
         + '<div class="soon">'
         +   '<img class="d-char" src="img/character2.png" alt="" onerror="this.style.display=\'none\'">'
@@ -430,23 +505,78 @@
       return;
     }
 
+    var data = dataFor(grade);
+    var rec  = (data && data[hak]) ? data[hak] : null;
+
     var html = ''
       + '<div class="tt-head">'
       +   '<img src="' + pickChar(name) + '" alt="" onerror="this.style.display=\'none\'">'
       +   '<div><div class="tt-who">' + esc(name) + (name !== "게스트" ? "님" : "") + '</div>'
       +   '<div class="tt-meta">' + (hak ? "학번 " + esc(hak) + " · " : "") + '1차 수요조사 신청 결과</div></div>'
       + '</div>'
-      + '<p class="tt-note">내가 <b>1차 수요조사</b>에서 신청한 과목을 <b>학기별</b>로 정리했어요.</p>';
+      + '<p class="tt-note">내가 <b>1차 수요조사</b>에서 신청한 과목이에요. 과목 옆에 <b>교과</b>와 <b>일반·진로·융합</b> 구분을 함께 표시했어요.</p>';
 
     if (!rec) {
       html += '<div class="sv-none">신청 내역을 찾을 수 없어요. 학번을 확인해 주세요.</div>';
     } else {
       html += '<div class="sv-wrap">'
-        + semBlock("1학기", rec.s1)
-        + semBlock("2학기", rec.s2)
+        + semBlock("1학기", rec.s1, grade)
+        + semBlock("2학기", rec.s2, grade)
         + '</div>';
     }
+    html += aggBtn;
+
     $("detailBody").innerHTML = html;
+    $("goAgg").addEventListener("click", function () { openDetail("surveyagg"); });
+  }
+
+  /* ---------- 교과별 신청 인원 (별도 하위페이지) ----------
+     window.SURVEY_AGG[grade] = {pick, s1:[{name,count}], s2:[...]} */
+  function aggSemTable(title, pick, list, grade) {
+    if (!list || !list.length) return "";
+    var max = 1;
+    list.forEach(function (it) { if (it.count > max) max = it.count; });
+    var rows = list.map(function (it) {
+      var w = Math.round((it.count / max) * 100);
+      return '<tr><td class="ag-name"><span class="ag-nm">' + esc(it.name) + '</span>' + subjTags(grade, it.name) + '</td>'
+        + '<td class="ag-bar"><span class="ag-fill" style="width:' + w + '%"></span></td>'
+        + '<td class="ag-cnt">' + it.count + '<span class="ag-unit">명</span></td></tr>';
+    }).join("");
+    return '<div class="ag-sem">'
+      + '<div class="sv-sem-h"><span class="sv-badge">' + title + '</span>'
+      +   (pick ? '<span class="sv-cnt">택' + pick + '</span>' : "") + '</div>'
+      + '<table class="ag-table"><tbody>' + rows + '</tbody></table>'
+      + '</div>';
+  }
+  function buildAgg(grade) {
+    var a = (window.SURVEY_AGG || {})[grade];
+    if (!a) return '<div class="sv-none">집계 데이터를 찾을 수 없어요.</div>';
+    return '<div class="ag-wrap">'
+      + aggSemTable("1학기", a.pick, a.s1, grade)
+      + aggSemTable("2학기", a.pick, a.s2, grade)
+      + '</div>';
+  }
+
+  function renderSurveyAgg() {
+    var grades = viewGrades();
+    var grade = grades[0];
+
+    function paint() {
+      document.querySelectorAll("#agTabs .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.g === grade); });
+      $("agBody").innerHTML = buildAgg(grade);
+    }
+
+    $("detailBody").innerHTML = ''
+      + '<button class="ag-back" id="agBack">‹ 1차 수요조사 결과</button>'
+      + '<p class="tt-note"><b>1차 수요조사</b> 기준 <b>교과별 신청 인원</b>이에요. (막대는 최다 과목 대비 비율)</p>'
+      + gradeTabsHtml("agTabs", grades, grade)
+      + '<div id="agBody"></div>';
+
+    $("agBack").addEventListener("click", function () { openDetail("survey"); });
+    document.querySelectorAll("#agTabs .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
+    });
+    paint();
   }
 
   function esc(s) {
@@ -466,9 +596,11 @@
     selectedGrade = null;
     // 랜딩 초기 상태로 복귀
     $("lpLogin").hidden = true;
+    $("lpTeacher").hidden = true;
     $("lpGrades").hidden = false;
     $("lpHak").value = "";
     $("lpName").value = "";
+    $("lpCode").value = "";
     clearErr();
     show("landing");
   }
