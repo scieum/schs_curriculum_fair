@@ -79,10 +79,10 @@ button{font-family:inherit;}
   border:1px solid #e0eecb;border-radius:18px;padding:20px;cursor:pointer;font-family:inherit;
   font-size:18px;font-weight:800;color:#36511f;box-shadow:0 8px 20px rgba(110,150,50,.16);}
 #landing .lp-grade:active{transform:scale(.99);background:#fbfdf3;}
-#landing .lp-teacher{display:block;width:100%;margin-top:2px;text-align:center;background:transparent;
-  border:1px dashed #bcd29a;border-radius:14px;padding:13px;cursor:pointer;font-family:inherit;
-  font-size:14px;font-weight:700;color:#5e7a3c;}
-#landing .lp-teacher:active{transform:scale(.99);background:rgba(255,255,255,.5);}
+#landing .lp-teacher{display:block;width:100%;text-align:center;background:rgba(255,255,255,.92);
+  border:1px solid #e0eecb;border-radius:18px;padding:20px;cursor:pointer;font-family:inherit;
+  font-size:18px;font-weight:800;color:#36511f;box-shadow:0 8px 20px rgba(110,150,50,.16);}
+#landing .lp-teacher:active{transform:scale(.99);background:#fbfdf3;}
 
 #landing .lp-login{flex:0 0 auto;display:flex;flex-direction:column;gap:10px;}
 #landing .lp-login-t{font-size:15px;font-weight:800;color:#36511f;margin-bottom:2px;}
