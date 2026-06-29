@@ -332,3 +332,45 @@ button{font-family:inherit;}
   background:linear-gradient(90deg,#9cc56f,#6aa84f);min-width:3px;}
 #detail .ag-cnt{width:1%;white-space:nowrap;text-align:right;font-size:14px;font-weight:800;color:#2f4a1c;}
 #detail .ag-cnt .ag-unit{font-size:11px;font-weight:700;color:#8a7c55;margin-left:1px;}
+
+/* ===================================================================
+   교사용 — 이름 자동완성 / 우리반 학생 위치 / PC 반응형
+   =================================================================== */
+/* 교사 이름 자동완성 */
+#landing .lp-ac{position:relative;}
+#landing .lp-sug{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;
+  background:#fff;border:1px solid #d3e4b8;border-radius:12px;
+  box-shadow:0 12px 26px rgba(60,80,30,.18);overflow:hidden;max-height:264px;overflow-y:auto;}
+#landing .lp-sug-item{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+  text-align:left;border:0;border-top:1px solid #f0f3e6;background:#fff;padding:12px 14px;
+  cursor:pointer;font-family:inherit;}
+#landing .lp-sug-item:first-child{border-top:0;}
+#landing .lp-sug-item:active{background:#f3f8e8;}
+#landing .lp-sug-nm{font-size:15px;font-weight:700;color:#36511f;}
+#landing .lp-sug-sub{font-size:12px;font-weight:600;color:#7d965a;}
+
+/* 우리반 학생 타임별 위치(행렬) */
+#detail .mc-wrap{overflow-x:auto;border:1px solid #ece7da;border-radius:14px;background:#fff;
+  box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .mc-table{border-collapse:collapse;width:100%;}
+#detail .mc-table th,#detail .mc-table td{border:1px solid #efe8d8;padding:6px 8px;
+  text-align:center;vertical-align:middle;font-size:12px;}
+#detail .mc-table thead th{background:#2f4a1c;color:#fff;font-weight:700;position:sticky;top:0;z-index:2;white-space:nowrap;}
+#detail .mc-table thead th.mc-corner{left:0;z-index:3;background:#27400f;}
+#detail .mc-table thead th .mc-when{display:block;font-size:9.5px;font-weight:600;opacity:.85;margin-top:2px;}
+#detail .mc-table tbody th.mc-stu{position:sticky;left:0;z-index:1;background:#f6f3ea;color:#6b5526;
+  white-space:nowrap;text-align:left;padding-left:10px;}
+#detail .mc-table tbody th .mc-no{display:inline-block;min-width:18px;color:#b89b50;margin-right:5px;font-weight:700;}
+#detail .mc-table tbody th .mc-nm{font-weight:800;color:#3a2f12;}
+#detail .mc-table td .mc-room{display:block;font-size:12px;font-weight:800;color:#1f7a3d;}
+#detail .mc-table td .mc-subj{display:block;font-size:10.5px;color:#8a7c55;margin-top:1px;line-height:1.25;word-break:keep-all;}
+#detail .mc-table td .mc-empty{color:#cdbf9d;}
+#detail .mc-table tbody tr:nth-child(even) td{background:#fcfbf7;}
+
+/* PC 반응형: 넓은 화면에서 앱을 더 넓게 + 바로가기 3열 */
+@media (min-width:900px){
+  .device.is-pc .app{max-width:980px;}
+  .device.is-pc #home .hero-card{width:calc(100% - 36px);}
+  .device.is-pc #home .menu-grid{grid-template-columns:repeat(3,1fr);}
+  .device.is-pc #detail .d-body{max-width:960px;margin:0 auto;}
+}

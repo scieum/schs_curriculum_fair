@@ -29,8 +29,10 @@
         </div>
         <div class="lp-login" id="lpTeacher" hidden>
           <div class="lp-login-t">교사용 로그인</div>
-          <input class="lp-input" id="lpTName" type="text" list="teacherNames" placeholder="교사 이름 검색" autocomplete="off" />
-          <datalist id="teacherNames"></datalist>
+          <div class="lp-ac">
+            <input class="lp-input" id="lpTName" type="text" placeholder="이름 입력" autocomplete="off" />
+            <div class="lp-sug" id="lpTSug" hidden></div>
+          </div>
           <input class="lp-input" id="lpCode" type="password" inputmode="numeric" maxlength="8" placeholder="교사용 코드" />
           <div class="lp-login-err" id="lpTErr" hidden></div>
           <button class="lp-login-btn" id="lpTBtn">확인</button>
@@ -80,9 +82,9 @@
 
       <!-- 본문 -->
       <div class="hbody">
-        <div class="hbody-h">바로가기</div>
+        <div class="hbody-h" id="hbodyH">바로가기</div>
         <!-- 바로가기 -->
-        <div class="menu-grid">
+        <div class="menu-grid" id="menuGrid">
           <button class="m-card m-top" data-go="survey">
             <span class="m-ic"><img src="img/pen.png" alt="" aria-hidden="true" /></span>
             <span class="m-tt">1차 수요조사 결과</span>
@@ -143,6 +145,7 @@
 <script src="data_survey_agg.js"></script>
 <script src="data_subject_meta.js"></script>
 <script src="data_teachers.js"></script>
+<script src="data_duty.js"></script>
 <script src="data_curriculum.js"></script>
 <script src="app.js"></script>
 </body>

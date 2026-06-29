@@ -83,21 +83,37 @@
     for (var i = 0; i < list.length; i++) { if (normName(list[i].name) === key) return list[i]; }
     return null;
   }
-  // 이름 자동완성 목록 채우기
-  (function fillTeacherDatalist() {
-    var dl = $("teacherNames"); if (!dl) return;
-    (window.TEACHERS || []).forEach(function (t) {
-      var o = document.createElement("option");
-      o.value = t.name + (t.subject ? " (" + t.subject + ")" : "");
-      dl.appendChild(o);
-    });
-  })();
+  // 이름 입력 자동완성: 입력값이 포함된 교사 이름 후보를 보여준다
+  function renderTeacherSug() {
+    var box = $("lpTSug");
+    var q = normName($("lpTName").value);
+    if (!q) { box.hidden = true; box.innerHTML = ""; return; }
+    var hits = (window.TEACHERS || []).filter(function (t) {
+      return normName(t.name).indexOf(q) !== -1;
+    }).slice(0, 8);
+    if (!hits.length) { box.hidden = true; box.innerHTML = ""; return; }
+    box.innerHTML = hits.map(function (t) {
+      return '<button type="button" class="lp-sug-item" data-name="' + esc(t.name) + '">'
+        + '<span class="lp-sug-nm">' + esc(t.name) + '</span>'
+        + (t.subject ? '<span class="lp-sug-sub">' + esc(t.subject) + '</span>' : "")
+        + '</button>';
+    }).join("");
+    box.hidden = false;
+  }
+  $("lpTName").addEventListener("input", renderTeacherSug);
+  $("lpTSug").addEventListener("click", function (e) {
+    var it = e.target.closest(".lp-sug-item"); if (!it) return;
+    $("lpTName").value = it.dataset.name;
+    $("lpTSug").hidden = true; $("lpTSug").innerHTML = "";
+    $("lpCode").focus();
+  });
   $("lpTeacherBtn").addEventListener("click", function () {
     $("lpGrades").hidden = true;
     $("lpTeacher").hidden = false;
     $("lpTErr").hidden = true;
     $("lpTName").value = "";
     $("lpCode").value = "";
+    $("lpTSug").hidden = true; $("lpTSug").innerHTML = "";
     $("lpTName").focus();
   });
   $("lpTBack").addEventListener("click", function () {
@@ -106,8 +122,7 @@
     $("lpTErr").hidden = true;
   });
   $("lpTBtn").addEventListener("click", function () {
-    // datalist 선택값에 붙는 " (과목)" 꼬리표 제거 후 이름만 추출
-    var raw = $("lpTName").value.trim().replace(/\s*\(.*\)\s*$/, "");
+    var raw = $("lpTName").value.trim();
     var t = findTeacher(raw);
     if (!t) { tErr("교사 명단에서 이름을 찾을 수 없어요."); return; }
     if ($("lpCode").value.trim() !== TEACHER_CODE) { tErr("교사용 코드가 올바르지 않아요."); return; }
@@ -192,7 +207,49 @@
     $("homeWho").textContent = nm;
     $("homeChar").src = pickChar(name);
     setDday();
+    applyHome(name);
     show("home");
+  }
+
+  // 바로가기 카드 한 장
+  function menuCard(go, ic, tt, sub) {
+    return '<button class="m-card m-top" data-go="' + go + '">'
+      + '<span class="m-ic"><img src="img/' + ic + '" alt="" aria-hidden="true" /></span>'
+      + '<span class="m-tt">' + tt + '</span>'
+      + '<span class="m-sub">' + sub + '</span></button>';
+  }
+
+  // 역할(학생/교사)에 따라 히어로 + 바로가기 메뉴를 다시 구성
+  function applyHome(name) {
+    var teacher = isTeacher();
+    var hero = $("heroTimetable");
+    var hT = hero.querySelector(".hc-title");
+    var hS = hero.querySelector(".hc-sub");
+    var menu = "";
+    if (teacher) {
+      hero.dataset.go = "schedule";
+      hT.textContent = "전체 일정 확인";
+      hS.textContent = "A~F 타임별 부스·교실 한눈에";
+      var t = findTeacher(name) || {};
+      menu += menuCard("duty", "calander.png", "임장 일정", "내 감독 시간·장소");
+      if (t.homeroom) menu += menuCard("myclass", "compass.png", "우리반 학생 위치", "타임별 이동 현황");
+      menu += menuCard("schedule", "pin.png", "전체 일정 확인", "박람회 타임테이블");
+      menu += menuCard("surveyagg", "graph.png", "교과별 신청 인원", "수요조사 집계");
+      menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
+      menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
+      menu += menuCard("metaverse", "Metaverse.png", "메타버스 박람회", "가상 공간 입장");
+    } else {
+      hero.dataset.go = "timetable";
+      hT.textContent = "나의 시간표 확인";
+      hS.textContent = "내가 선택한 과목 한눈에";
+      menu += menuCard("survey", "pen.png", "1차 수요조사 결과", "학기별 신청 과목");
+      menu += menuCard("recommend", "compass.png", "선택과목 추천", "나에게 맞는 과목 찾기");
+      menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
+      menu += menuCard("metaverse", "Metaverse.png", "메타버스 박람회", "가상 공간 입장");
+      menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
+      menu += menuCard("schedule", "calander.png", "전체 일정 확인", "박람회 타임테이블");
+    }
+    $("menuGrid").innerHTML = menu;
   }
 
   /* ---------- 5) 메뉴 라우팅 ---------- */
@@ -202,7 +259,9 @@
     surveyagg:  "교과별 신청 인원",
     metaverse:  "메타버스 박람회 접속",
     curriculum: "우리학교 편제표 확인",
-    schedule:   "전체 일정 확인"
+    schedule:   "전체 일정 확인",
+    duty:       "임장 일정",
+    myclass:    "우리반 학생 위치"
   };
   // 외부 링크로 바로 연결되는 메뉴
   var LINKS = {
@@ -218,14 +277,17 @@
     recommend: "recommend/index.html"   // 선택과목 추천 (Course_registration 통합)
   };
 
-  document.querySelectorAll(".m-card[data-go]").forEach(function (card) {
-    card.addEventListener("click", function () {
-      var key = card.dataset.go;
-      if (key === "ebook") { openEbook(); return; }                    // 학년별 분기
-      if (PAGES[key]) { window.location.href = PAGES[key]; return; }   // 세션 그대로 이어짐
-      if (LINKS[key]) { window.open(LINKS[key], "_blank", "noopener"); return; }
-      openDetail(key);
-    });
+  function handleGo(key) {
+    if (!key) return;
+    if (key === "ebook") { openEbook(); return; }                    // 학년별 분기
+    if (PAGES[key]) { window.location.href = PAGES[key]; return; }   // 세션 그대로 이어짐
+    if (LINKS[key]) { window.open(LINKS[key], "_blank", "noopener"); return; }
+    openDetail(key);
+  }
+  // 메뉴/히어로는 역할에 따라 동적으로 다시 그리므로 위임 방식으로 처리
+  $("menuGrid").addEventListener("click", function (e) {
+    var card = e.target.closest(".m-card[data-go]");
+    if (card) handleGo(card.dataset.go);
   });
   function openDetail(key) {
     $("detailTitle").textContent = MENU[key] || "안내";
@@ -234,6 +296,8 @@
     else if (key === "surveyagg") renderSurveyAgg();
     else if (key === "schedule") renderSchedule();
     else if (key === "curriculum") renderCurriculum();
+    else if (key === "duty") renderDuty();
+    else if (key === "myclass") renderMyClass();
     else renderSoon();
     show("detail");
   }
@@ -619,14 +683,100 @@
     paint();
   }
 
+  /* ---------- (교사) 임장 일정 ----------
+     window.DUTY[교사이름] = [{time:"A", booth, room, grade}], 배정표는 추후 제공 */
+  var SLOT_ORDER = { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5 };
+  function renderDuty() {
+    var name = localStorage.getItem(KEY.name) || "";
+    var t = findTeacher(name) || {};
+    var head = '<div class="tt-head">'
+      + '<img src="' + pickChar(name) + '" alt="" onerror="this.style.display=\'none\'">'
+      + '<div><div class="tt-who">' + esc(name) + '님</div>'
+      + '<div class="tt-meta">' + (t.subject ? esc(t.subject) + ' · ' : '') + '임장(감독) 일정</div></div>'
+      + '</div>';
+
+    var my = (window.DUTY || {})[name] || [];
+    if (!my.length) {
+      $("detailBody").innerHTML = head
+        + '<div class="soon">'
+        +   '<img class="d-char" src="img/character2.png" alt="" onerror="this.style.display=\'none\'">'
+        +   '<div class="d-soon">임장 배정표 준비 중이에요</div>'
+        +   '<div class="d-desc">감독 배정표가 확정되면, 선생님이 <b>어느 타임</b>에 <b>어느 부스·교실</b>에 들어가야 하는지 여기에서 바로 보여드릴게요.</div>'
+        + '</div>';
+      return;
+    }
+    my = my.slice().sort(function (a, b) { return (SLOT_ORDER[a.time] || 0) - (SLOT_ORDER[b.time] || 0); });
+    var rows = my.map(function (d) {
+      var i = SLOT_ORDER[d.time] || 0;
+      return '<tr>'
+        + '<td class="c-time"><span class="t-no">' + esc(d.time || "") + '</span></td>'
+        + '<td class="c-when"><span class="t-when">' + (TIME_SLOTS[i] || "") + '</span></td>'
+        + '<td><span class="t-subj">' + esc(d.booth || "") + '</span>'
+        +   (d.room ? '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(d.room) + '</span>' : "")
+        + '</td></tr>';
+    }).join("");
+    $("detailBody").innerHTML = head
+      + '<p class="tt-note">선생님이 <b>감독(임장)</b>할 타임과 부스·교실이에요.</p>'
+      + '<table class="tt-table"><thead><tr><th class="c-time">타임</th><th class="c-when">시간</th><th>감독 부스 · 교실</th></tr></thead><tbody>'
+      + rows + '</tbody></table>';
+  }
+
+  /* ---------- (담임) 우리반 학생 타임별 위치 ----------
+     담임(homeroom 101~208) → 반 학생 명렬 × A~F 타임 = 이동 교실 행렬 */
+  function renderMyClass() {
+    var name = localStorage.getItem(KEY.name) || "";
+    var t = findTeacher(name);
+    if (!t || !t.homeroom) {
+      $("detailBody").innerHTML = '<div class="sv-none">담임 학급 정보가 없어요.</div>';
+      return;
+    }
+    var hr = String(t.homeroom);
+    var grade = hr.charAt(0);
+    var ban = parseInt(hr.slice(1), 10);
+    var cls = grade + "-" + ban;
+    var ds = datasetFor(grade) || {};
+    var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
+
+    var studs = [];
+    for (var hak in ds) {
+      var r = ds[hak];
+      if (r && r.cls === cls) studs.push({ no: r.no, name: r.name, slots: r.slots || [] });
+    }
+    studs.sort(function (a, b) { return a.no - b.no; });
+    if (!studs.length) {
+      $("detailBody").innerHTML = '<div class="sv-none">' + esc(cls) + '반 학생 데이터를 찾을 수 없어요.</div>';
+      return;
+    }
+
+    var thTimes = "";
+    for (var i = 0; i < 6; i++) thTimes += '<th>' + SLOT_LETTERS[i] + '<span class="mc-when">' + (TIME_SLOTS[i] || "") + '</span></th>';
+    var body = studs.map(function (s) {
+      var tds = "";
+      for (var j = 0; j < 6; j++) {
+        var subj = s.slots[j] || "";
+        var room = (ROOMS[subj] || {})[SLOT_LETTERS[j]] || "";
+        tds += '<td>'
+          + (room ? '<span class="mc-room">' + esc(room) + '</span>' : "")
+          + (subj ? '<span class="mc-subj">' + esc(subj) + '</span>' : '<span class="mc-empty">·</span>')
+          + '</td>';
+      }
+      return '<tr><th class="mc-stu"><span class="mc-no">' + s.no + '</span><span class="mc-nm">' + esc(s.name) + '</span></th>' + tds + '</tr>';
+    }).join("");
+
+    $("detailBody").innerHTML = ''
+      + '<p class="tt-note"><b>' + esc(cls) + '반</b> 학생들이 타임별로 이동하는 <b>부스·교실</b>이에요. (총 ' + studs.length + '명)</p>'
+      + '<div class="mc-wrap"><table class="mc-table"><thead><tr><th class="mc-corner">번호·이름</th>' + thTimes + '</tr></thead><tbody>'
+      + body + '</tbody></table></div>';
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
 
-  // 히어로 박스 → 나의 시간표
-  $("heroTimetable").addEventListener("click", function () { openDetail("timetable"); });
+  // 히어로 박스 (학생=나의 시간표 / 교사=전체 일정)
+  $("heroTimetable").addEventListener("click", function () { handleGo(this.dataset.go || "timetable"); });
 
   /* ---------- MY PAGE (내 정보 + 로그아웃) ---------- */
   function logout() {
