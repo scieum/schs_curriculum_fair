@@ -201,17 +201,21 @@
       +     (hak ? "학번 " + esc(hak) + (clsLabel ? " · " + clsLabel : "") : "6타임 이동 시간표")
       +   '</div></div>'
       + '</div>'
-      + '<p class="tt-note">각 <b>타임(A~F)</b>의 시간과 <b>수강 과목</b>을 확인하세요. 시간에 맞춰 이동해 주세요!</p>'
+      + '<p class="tt-note">각 타임의 <b>수강 과목</b>과 <b>이동 교실</b>을 확인하세요. 시간에 맞춰 이동해 주세요!</p>'
       + '<table class="tt-table"><thead><tr>'
-      +   '<th class="c-time">타임</th><th class="c-when">시간</th><th>수강 과목</th>'
+      +   '<th class="c-time">타임</th><th class="c-when">시간</th><th>수강 과목 · 이동 교실</th>'
       + '</tr></thead><tbody>';
 
+    var ROOMS = window.ROOMS_G1 || {};
     for (var i = 0; i < 6; i++) {
       var subj = subjects[i] || "-";
+      var room = (ROOMS[subj] || {})[SLOT_LETTERS[i]] || "";
       html += '<tr>'
         +  '<td class="c-time"><span class="t-no">' + SLOT_LETTERS[i] + '</span></td>'
         +  '<td class="c-when"><span class="t-when">' + (TIME_SLOTS[i] || "") + '</span></td>'
-        +  '<td><span class="t-subj">' + esc(subj) + '</span></td>'
+        +  '<td><span class="t-subj">' + esc(subj) + '</span>'
+        +     (room ? '<span class="t-room">📍 ' + esc(room) + '</span>' : "")
+        +  '</td>'
         + '</tr>';
     }
     html += '</tbody></table>';
