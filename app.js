@@ -676,22 +676,92 @@
       + '</div>';
   }
 
+  /* ---------- 교과별 신청 인원 — 그래프(막대차트) 보기 ---------- */
+  var KIND_COLOR = { "일반": "#6aa84f", "진로": "#4a82c8", "융합": "#d98f3a", "공통": "#9a9a9a" };
+  function aggChartSem(title, pick, list, grade) {
+    if (!list || !list.length) return "";
+    var META = (window.SUBJECT_META || {})[grade] || {};
+    var max = 1; list.forEach(function (it) { if (it.count > max) max = it.count; });
+    var bw = 34, gap = 14, padL = 16, padR = 16, padT = 22, padB = 96, plotH = 200;
+    var n = list.length;
+    var w = padL + padR + n * bw + (n - 1) * gap;
+    var h = padT + plotH + padB;
+    var baseY = padT + plotH;
+    var svg = '<line x1="' + padL + '" y1="' + baseY + '" x2="' + (w - padR) + '" y2="' + baseY + '" class="agc-axis"/>';
+    list.forEach(function (it, i) {
+      var x = padL + i * (bw + gap);
+      var bh = Math.max(2, Math.round(it.count / max * plotH));
+      var y = baseY - bh;
+      var kind = (META[it.name] || {}).kind;
+      var fill = KIND_COLOR[kind] || "#6aa84f";
+      var cx = x + bw / 2, ly = baseY + 10;
+      svg += '<rect x="' + x + '" y="' + y + '" width="' + bw + '" height="' + bh + '" rx="5" fill="' + fill + '"/>'
+        + '<text x="' + cx + '" y="' + (y - 5) + '" text-anchor="middle" class="agc-val">' + it.count + '</text>'
+        + '<text x="' + cx + '" y="' + ly + '" text-anchor="end" transform="rotate(-50 ' + cx + ' ' + ly + ')" class="agc-lbl">' + esc(it.name) + '</text>';
+    });
+    return '<div class="ag-sem">'
+      + '<div class="sv-sem-h"><span class="sv-badge">' + title + '</span>'
+      +   (pick ? '<span class="sv-cnt">택' + pick + '</span>' : "") + '</div>'
+      + '<div class="agc-scroll"><svg class="agc-svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' + svg + '</svg></div>'
+      + '</div>';
+  }
+  function buildAggChart(grade) {
+    var a = (window.SURVEY_AGG || {})[grade];
+    if (!a) return '<div class="sv-none">집계 데이터를 찾을 수 없어요.</div>';
+    var legend = '<div class="agc-legend">'
+      + '<span><i style="background:#6aa84f"></i>일반</span>'
+      + '<span><i style="background:#4a82c8"></i>진로</span>'
+      + '<span><i style="background:#d98f3a"></i>융합</span></div>';
+    return '<div class="ag-wrap">' + legend
+      + aggChartSem("1학기", a.pick, a.s1, grade)
+      + aggChartSem("2학기", a.pick, a.s2, grade)
+      + '</div>';
+  }
+
+  // 집계 → CSV(엑셀) 다운로드
+  function downloadAgg(grade) {
+    var a = (window.SURVEY_AGG || {})[grade];
+    if (!a) return;
+    var META = (window.SUBJECT_META || {})[grade] || {};
+    var rows = [["학기", "과목", "교과", "구분", "신청인원"]];
+    [["1학기", a.s1], ["2학기", a.s2]].forEach(function (pair) {
+      pair[1].forEach(function (it) {
+        var m = META[it.name] || {};
+        rows.push([pair[0], it.name, m.dept || "", m.kind || "", it.count]);
+      });
+    });
+    downloadCsv("교과별_신청인원_" + grade + "학년.csv", rows);
+  }
+
   function renderSurveyAgg() {
     var grades = viewGrades();
     var grade = grades[0];
+    var mode = "bars";   // bars = 막대 목록, chart = 그래프
 
     function paint() {
+      document.querySelectorAll("#agModes .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.m === mode); });
       document.querySelectorAll("#agTabs .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.g === grade); });
-      $("agBody").innerHTML = buildAgg(grade);
+      $("agBody").innerHTML = (mode === "chart") ? buildAggChart(grade) : buildAgg(grade);
     }
 
     $("detailBody").innerHTML = ''
       + '<button class="ag-back" id="agBack">‹ 1차 수요조사 결과</button>'
-      + '<p class="tt-note"><b>1차 수요조사</b> 기준 <b>교과별 신청 인원</b>이에요. (막대는 최다 과목 대비 비율)</p>'
+      + '<div class="ag-top">'
+      +   '<p class="tt-note ag-top-note"><b>1차 수요조사</b> 기준 <b>교과별 신청 인원</b>이에요.</p>'
+      +   '<button class="mc-print ag-xlsx" id="agXlsx">⬇️ 엑셀 다운로드</button>'
+      + '</div>'
+      + '<div class="sch-modes" id="agModes">'
+      +   '<button class="sch-tab" data-m="bars">막대 목록</button>'
+      +   '<button class="sch-tab" data-m="chart">그래프</button>'
+      + '</div>'
       + gradeTabsHtml("agTabs", grades, grade)
       + '<div id="agBody"></div>';
 
     $("agBack").addEventListener("click", function () { openDetail("survey"); });
+    $("agXlsx").addEventListener("click", function () { downloadAgg(grade); });
+    document.querySelectorAll("#agModes .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { mode = b.dataset.m; paint(); });
+    });
     document.querySelectorAll("#agTabs .sch-tab").forEach(function (b) {
       b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
     });
@@ -784,13 +854,47 @@
     $("detailBody").innerHTML = ''
       + '<div class="mc-head">'
       +   '<p class="tt-note mc-note"><b>' + esc(cls) + '반</b> 학생들이 타임별로 이동하는 <b>부스·교실</b>이에요. (총 ' + studs.length + '명)</p>'
-      +   '<button class="mc-print" id="mcPrint">🖨️ 인쇄</button>'
+      +   '<div class="mc-acts">'
+      +     '<button class="mc-print mc-xlsx" id="mcXlsx">⬇️ 엑셀</button>'
+      +     '<button class="mc-print" id="mcPrint">🖨️ 인쇄</button>'
+      +   '</div>'
       + '</div>'
       + tableHtml;
 
     $("mcPrint").addEventListener("click", function () {
       openPrintWindow(esc(cls) + "반 학생 타임별 위치 (총 " + studs.length + "명)", tableHtml);
     });
+    $("mcXlsx").addEventListener("click", function () {
+      var header = ["번호", "이름"];
+      for (var k = 0; k < 6; k++) header.push(SLOT_LETTERS[k] + " (" + (TIME_SLOTS[k] || "") + ")");
+      var rows = [header];
+      studs.forEach(function (s) {
+        var row = [s.no, s.name];
+        for (var k = 0; k < 6; k++) {
+          var subj = s.slots[k] || "";
+          var room = (ROOMS[subj] || {})[SLOT_LETTERS[k]] || "";
+          row.push(subj ? (room ? room + " / " + subj : subj) : "");
+        }
+        rows.push(row);
+      });
+      downloadCsv(cls + "반_학생_타임별_위치.csv", rows);
+    });
+  }
+
+  // 2차원 배열 → CSV(엑셀, UTF-8 BOM) 다운로드
+  function downloadCsv(filename, rows) {
+    var csv = rows.map(function (r) {
+      return r.map(function (c) {
+        c = (c == null) ? "" : String(c);
+        return /[",\n\r]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c;
+      }).join(",");
+    }).join("\r\n");
+    var blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
   /* ---------- 인쇄용 새 창 (가로 방향) ---------- */
