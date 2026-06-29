@@ -337,7 +337,8 @@ button{font-family:inherit;}
    교사용 — 이름 자동완성 / 우리반 학생 위치 / PC 반응형
    =================================================================== */
 /* 교사 이름 자동완성 */
-#landing .lp-ac{position:relative;}
+#landing .lp-ac{position:relative;width:100%;}
+#landing .lp-ac .lp-input{width:100%;display:block;}
 #landing .lp-sug{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;
   background:#fff;border:1px solid #d3e4b8;border-radius:12px;
   box-shadow:0 12px 26px rgba(60,80,30,.18);overflow:hidden;max-height:264px;overflow-y:auto;}
