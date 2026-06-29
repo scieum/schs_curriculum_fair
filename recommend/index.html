@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<title>속초고 계열별 추천과목 가이드</title>
+<style>
+  /* ===== Pretendard 웹폰트 ===== */
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');font-weight:100;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');font-weight:200;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2');font-weight:300;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');font-weight:400;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');font-weight:500;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2');font-weight:700;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2') format('woff2');font-weight:800;font-display:swap;}
+  @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');font-weight:900;font-display:swap;}
+  :root{
+    --black:#171717; --near:#262626; --ink:#404040;
+    --stone:#525252; --mute:#737373; --silver:#a3a3a3;
+    --line:#e5e5e5; --line2:#d4d4d4; --snow:#fafafa; --soft:#f0f0f0; --white:#fff;
+    --rad-card:12px; --rad-pill:9999px;
+    --disp:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
+    --body:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--white);color:var(--black);font-family:var(--body);}
+  body{font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px 96px;}
+
+  /* Header */
+  header{position:sticky;top:0;background:var(--white);z-index:20;padding:18px 0 10px;border-bottom:1px solid var(--line);}
+  h1{font-family:var(--disp);font-weight:500;font-size:21px;line-height:1.15;margin:0;letter-spacing:-.2px;}
+  .sub{font-size:13px;color:var(--mute);margin-top:4px;}
+
+  /* Mode tabs */
+  .modes{display:flex;gap:8px;margin:14px 0 10px;}
+  .mode{flex:1;border:1px solid var(--line);background:var(--white);color:var(--stone);
+    border-radius:var(--rad-pill);padding:9px 0;font-size:14px;font-weight:500;text-align:center;cursor:pointer;}
+  .mode.on{background:var(--near);color:var(--white);border-color:var(--near);}
+
+  /* Selector chips (계열/학교) */
+  .picker{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none;}
+  .picker::-webkit-scrollbar{display:none;}
+  .pick{flex:0 0 auto;border:1px solid var(--line);background:var(--white);color:var(--stone);
+    border-radius:var(--rad-pill);padding:8px 16px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .pick.on{background:var(--soft);color:var(--black);border-color:var(--line2);}
+
+  /* Controls row */
+  .controls{display:flex;align-items:center;gap:10px;margin:2px 0 14px;}
+  .search{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:var(--rad-pill);padding:8px 14px;background:var(--white);}
+  .search input{border:0;outline:0;font-size:14px;width:100%;background:transparent;color:var(--black);font-family:var(--body);}
+  .search input::placeholder{color:var(--silver);}
+  .toggle{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--stone);cursor:pointer;white-space:nowrap;user-select:none;}
+  .sw{width:38px;height:22px;border-radius:var(--rad-pill);background:var(--line);position:relative;transition:none;flex:0 0 auto;}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:var(--rad-pill);background:var(--white);border:1px solid var(--line2);}
+  .toggle.on .sw{background:var(--near);}
+  .toggle.on .sw::after{left:18px;border-color:var(--near);}
+
+  /* Section heading */
+  .gye-head{font-family:var(--disp);font-weight:500;font-size:17px;margin:6px 0 12px;display:flex;align-items:baseline;gap:8px;}
+  .gye-head .cnt{font-size:12px;color:var(--silver);font-weight:400;}
+
+  /* University card */
+  .card{border:1px solid var(--line);border-radius:var(--rad-card);padding:16px;margin-bottom:12px;background:var(--white);}
+  .uni{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px;}
+  .uni .name{font-family:var(--disp);font-weight:500;font-size:16px;}
+  .uni .field{font-size:12px;color:var(--silver);}
+  .mojip{font-size:14px;font-weight:500;color:var(--near);margin:10px 0 2px;line-height:1.4;}
+  .note{font-size:12px;color:var(--mute);margin:1px 0 8px;}
+  .meta{font-size:11px;color:var(--silver);margin:2px 0 8px;}
+
+  /* subject group label */
+  .grp{font-size:11px;color:var(--mute);margin:8px 0 5px;letter-spacing:.3px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+
+  /* Chips by 편제 status */
+  .chip{display:inline-flex;align-items:center;gap:6px;border-radius:var(--rad-pill);
+    padding:5px 11px;font-size:13px;border:1px solid transparent;line-height:1.2;}
+  .chip .g{font-size:11px;font-weight:500;}
+  /* 개설 (offered) — 연한 하늘색 */
+  .chip.open{background:#e6f3fc;color:#0f3a52;border-color:#c9e6f7;}
+  .chip.open .g{color:#3f7da3;}
+  /* 미개설 (not offered) — 연한 분홍색 */
+  .chip.none{background:#fce8ed;color:#8f3b50;border-color:#f6ccd6;}
+  .chip.none .nm{text-decoration:line-through;}
+  .chip.none .g{color:#b06b7c;}
+  /* 교과영역 (broad area / unmatched) */
+  .chip.area{background:var(--white);color:var(--stone);border:1px solid var(--line);}
+  /* 담은(선택한) 과목 — 탭으로 토글 */
+  #results .chip,.modal .chip{cursor:pointer;}
+  .chip.picked{box-shadow:0 0 0 2px var(--near);}
+  .chip.picked .nm::before{content:"✓ ";font-weight:700;}
+  /* 확정(잠금) 과목 — 2학년 1·2학기 수강 확정, 변경 불가 */
+  #results .chip.locked,.modal .chip.locked{cursor:default;opacity:.96;}
+  .chip.locked.picked .nm::before{content:"🔒 ";}
+  .modal .chip.locked:not(.picked) .nm::before{content:"🔒 ";}
+  /* 학기별 정원 표시 */
+  .q-cnt{font-weight:700;color:var(--silver);font-size:.92em;}
+  .q-cnt.done{color:#0f7a3d;}
+  .q-cnt.over{color:#c0392b;}
+  .my-quota-note{font-size:12px;color:var(--mute);margin-bottom:12px;}
+  /* 중앙대 모달: 담기 인터페이스 */
+  .modal .mpick{font-size:12.5px;color:var(--stone);background:var(--snow);border:1px solid var(--line);
+    border-radius:10px;padding:9px 12px;margin:12px 0 2px;line-height:1.4;}
+  .modal .mpick b{color:var(--near);font-weight:700;}
+  .modal .chip:not(.picked) .nm::before{content:"+ ";color:var(--silver);font-weight:700;}
+  /* 홈 통계 팝업 */
+  #home .stat.to-my{cursor:pointer;}
+  #home .stat.to-my:active{background:#fbf7ee;}
+  .modal .e-pop{width:32px;height:32px;object-fit:contain;flex:0 0 auto;}
+  .modal .pop-empty{text-align:center;color:var(--silver);font-size:13px;padding:34px 6px;line-height:1.6;}
+  .modal .gye-pop{display:flex;flex-direction:column;gap:9px;margin-top:14px;}
+  .modal .gye-pop .gye-chip{text-align:left;border:1px solid var(--line2);background:var(--snow);
+    border-radius:12px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--near);
+    font-family:inherit;cursor:pointer;}
+  .modal .gye-pop .gye-chip:active{background:var(--soft);}
+
+  .modal .mpick-bar{position:sticky;bottom:0;display:flex;justify-content:flex-end;
+    padding:10px 0 2px;margin-top:8px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 45%);}
+  .modal .mpick-btn{border:1px solid #c9e6f7;background:#e6f3fc;color:#0f3a52;border-radius:9999px;
+    padding:8px 18px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;}
+  .modal .mpick-btn:active{filter:brightness(.96);}
+
+  /* core badge */
+  .core-tag{display:inline-block;font-size:10px;font-weight:500;color:var(--white);background:var(--near);
+    border-radius:var(--rad-pill);padding:2px 8px;margin-left:2px;vertical-align:middle;}
+
+  /* guide card */
+  .card.guide .ln{font-size:13px;color:var(--stone);margin:3px 0;line-height:1.45;}
+  .card.guide .ln.h{font-weight:500;color:var(--near);margin-top:6px;}
+
+  /* legend / empty */
+  .legend{border:1px solid var(--line);border-radius:var(--rad-card);padding:14px 16px;margin-top:18px;background:var(--snow);}
+  .legend h3{font-family:var(--disp);font-weight:500;font-size:14px;margin:0 0 10px;}
+  .legend .row{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:12.5px;color:var(--stone);}
+  .empty{text-align:center;color:var(--silver);font-size:14px;padding:40px 0;}
+  .foot{font-size:11px;color:var(--silver);text-align:center;margin-top:18px;line-height:1.6;}
+
+  /* Logo */
+  .uleft{display:flex;align-items:center;gap:9px;min-width:0;}
+  .logo{height:24px;width:auto;max-width:34px;object-fit:contain;border-radius:4px;flex:0 0 auto;}
+
+  /* 중앙대 clickable card */
+  .card.cau{cursor:pointer;}
+  .card.cau:active{filter:brightness(.96);}
+  .desc{font-size:13px;color:var(--mute);margin:5px 0 0;line-height:1.45;}
+  .cau-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:8px;}
+  .more{font-size:13px;color:var(--near);font-weight:500;white-space:nowrap;}
+
+  /* Modal (mobile bottom sheet) */
+  .modal-back{position:fixed;inset:0;background:rgba(23,23,23,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50;}
+  .modal-back[hidden]{display:none;}
+  .modal{background:var(--white);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:12px 20px 40px;}
+  @media(min-width:560px){ .modal-back{align-items:center;} .modal{border-radius:16px;} }
+  .grab{width:38px;height:4px;border-radius:9999px;background:var(--line2);margin:6px auto 10px;}
+  .mtop{display:flex;justify-content:flex-end;margin-bottom:6px;}
+  .mclose{font-size:13px;color:var(--stone);border:1px solid var(--line);background:var(--white);border-radius:9999px;padding:6px 16px;cursor:pointer;}
+  .mhead{display:flex;align-items:center;gap:11px;margin-bottom:4px;}
+  .modal .mhead + .chips{margin-top:16px;}
+  .mhead .logo{height:36px;max-width:48px;}
+  .muni{font-size:12px;color:var(--silver);}
+  .mmojip{font-family:var(--disp);font-weight:500;font-size:19px;line-height:1.2;}
+  .mdesc{font-size:13.5px;color:var(--stone);margin:11px 0 0;line-height:1.5;}
+  .mmeta{font-size:11px;color:var(--silver);margin:9px 0 2px;}
+  .semgrp{margin-top:16px;}
+  .semlabel{font-size:12px;color:var(--mute);font-weight:500;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line);}
+
+  /* ===================== 화면 전환 ===================== */
+  .screen{min-height:100vh;}
+  [hidden]{display:none!important;}
+
+  /* ===================== 홈(랜딩, 과목 탐험) ===================== */
+  /* 양옆은 흰 배경(body) · 가운데 모바일 영역에만 따뜻한 그라데이션 */
+  #home{max-width:480px;margin:0 auto;min-height:100vh;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,
+      #84C0EC 0px,        /* 하늘 상단(진한 하늘색) */
+      #A6D2F1 140px,
+      #CCE6F7 300px,
+      #E9F4FC 398px,      /* 지평선 직전(옅은 하늘색) */
+      #ECDCB4 398px,      /* 땅 시작(모래색) */
+      #E3CE9A 620px,
+      #E3CE9A 100%);}
+
+  /* 헤더 */
+  #home .hdr{display:flex;align-items:center;gap:8px;padding:14px 16px 8px;}
+  #home .ico{width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+    color:#3a2e16;background:transparent;border:0;border-radius:12px;cursor:pointer;}
+  #home .ico:active{background:rgba(255,255,255,.45);}
+  #home .ico svg{width:24px;height:24px;}
+  #home .h-title{flex:1;text-align:center;font-size:18px;font-weight:700;color:#3a2e16;}
+  #home .h-right{display:flex;gap:2px;}
+
+  /* 히어로: 걸음 수 → 살펴본 추천과목 */
+  #home .hero{padding:28px 22px 0;position:relative;}
+  #home .hero .label{font-size:15px;font-weight:600;color:#6b5526;}
+  #home .hero .count{display:flex;align-items:center;gap:10px;margin-top:6px;}
+  #home .hero .count .emoji{font-size:34px;}
+  #home .hero .count .num{font-size:46px;font-weight:800;letter-spacing:-1px;color:#2b2310;line-height:1;}
+  #home .hero .count .unit{font-size:18px;font-weight:700;color:#6b5526;align-self:flex-end;margin-bottom:5px;}
+
+  /* 캐릭터 무대 */
+  #home .stage{position:relative;height:236px;margin-top:6px;display:flex;align-items:flex-end;justify-content:center;}
+  #home .leaf{position:absolute;height:auto;width:96px;   /* 세 개 동일 크기 */
+    filter:drop-shadow(0 6px 9px rgba(120,80,20,.2));will-change:transform;}
+  #home .l1{top:-24px;right:2px;animation:float1 5s ease-in-out infinite;}    /* 학교 (3칸 위로) */
+  #home .l2{top:116px;right:6px;animation:float2 4.2s ease-in-out infinite;}  /* 연필(1시 방향·3칸 위로, 땅에 안 닿게) */
+  #home .l3{top:40px;left:2px;animation:float3 5.6s ease-in-out infinite;}   /* 책 */
+  /* 살짝씩 360° 랜덤 방향으로 떠다님 */
+  @keyframes float1{0%{transform:translate(0,0) rotate(0deg)}20%{transform:translate(6px,-5px) rotate(2deg)}
+    45%{transform:translate(8px,4px) rotate(-2deg)}70%{transform:translate(-4px,6px) rotate(1deg)}
+    100%{transform:translate(0,0) rotate(0deg)}}
+  @keyframes float2{0%{transform:translate(0,0) rotate(30deg)}25%{transform:translate(-6px,-4px) rotate(34deg)}
+    50%{transform:translate(5px,-7px) rotate(26deg)}75%{transform:translate(7px,5px) rotate(32deg)}
+    100%{transform:translate(0,0) rotate(30deg)}}
+  @keyframes float3{0%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(-7px,5px) rotate(-3deg)}
+    55%{transform:translate(4px,7px) rotate(2deg)}80%{transform:translate(6px,-4px) rotate(-1deg)}
+    100%{transform:translate(0,0) rotate(0deg)}}
+  #home .char{position:relative;z-index:2;width:188px;max-width:56%;height:auto;
+    filter:drop-shadow(0 16px 18px rgba(120,80,20,.28));animation:bob 3s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  #home .shadow{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+    width:150px;height:18px;border-radius:50%;background:rgba(120,80,20,.18);filter:blur(7px);z-index:1;}
+
+  /* 진행바(마일스톤) */
+  #home .progress{padding:0 22px;margin-top:10px;margin-bottom:22px;position:relative;z-index:3;}
+  #home .bar{position:relative;height:8px;background:#f0e3c4;border-radius:99px;margin:0 6px;}
+  #home .bar .fill{position:absolute;left:0;top:0;height:100%;width:0%;
+    background:linear-gradient(90deg,#FB923C,#F97316);border-radius:99px;}
+  #home .bar .knob{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#F97316;
+    border:3px solid #fff;transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(180,90,10,.4);}
+  #home .bar .dot{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;
+    transform:translate(-50%,-50%);box-shadow:0 0 0 2px #f0e3c4;}
+  #home .ticks{display:flex;margin-top:12px;}
+  #home .tick{flex:1;text-align:center;cursor:pointer;}
+  #home .tick .t-lab{font-size:13px;font-weight:600;color:#3a2e16;}
+  #home .tick.off .t-lab{color:#bfae86;}
+  #home .tick .t-btn{margin-top:2px;display:inline-flex;align-items:center;gap:5px;
+    background:#fff;border:1px solid #f0e3c4;color:#3a2e16;border-radius:99px;
+    padding:7px 14px;font-size:13px;font-weight:700;box-shadow:0 4px 10px rgba(150,100,20,.10);
+    font-family:inherit;cursor:pointer;}
+  #home .tick .t-btn:active{transform:scale(.96);}
+  #home .tick.off .t-btn{background:#eee6d4;border-color:#eee6d4;color:#c2b48f;box-shadow:none;}
+
+  /* 본문(흰 영역) */
+  #home .hbody{padding:22px 16px 90px;background:#fff;}
+  #home .stat-row{display:flex;gap:12px;}
+  #home .stat{flex:1;background:#fff;border:1px solid #f1ead9;border-radius:18px;padding:16px 16px 18px;
+    box-shadow:0 6px 18px rgba(120,90,30,.06);}
+  #home .stat .s-top{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:600;color:#6b5526;}
+  #home .stat .s-top .chev{color:#c2b48f;font-weight:700;}
+  #home .stat .s-val{display:flex;align-items:center;gap:8px;margin-top:8px;}
+  #home .stat .s-val .e{font-size:24px;}
+  #home .stat .s-val img.e{width:30px;height:30px;object-fit:contain;}
+  #home .stat .s-val .n{font-size:26px;font-weight:800;color:#2b2310;}
+
+  /* 바로가기 리스트 카드 */
+  #home .list-card{background:#fff;border:1px solid #f1ead9;border-radius:20px;margin-top:14px;padding:4px 4px;
+    box-shadow:0 6px 18px rgba(120,90,30,.06);}
+  #home .row{display:flex;align-items:center;gap:14px;width:100%;background:transparent;border:0;
+    padding:16px 16px;text-align:left;cursor:pointer;font-family:inherit;}
+  #home .row + .row{border-top:1px solid #f4eee0;}
+  #home .row:active{background:#fbf7ee;}
+  #home .row .r-ic{width:46px;height:46px;flex:0 0 auto;border-radius:14px;display:flex;
+    align-items:center;justify-content:center;font-size:24px;background:#fff4dd;}
+  #home .row .r-ic img{width:32px;height:32px;object-fit:contain;}
+  #home .row .r-tx{flex:1;min-width:0;}
+  #home .row .r-sub{display:block;font-size:12.5px;color:#9a895f;}
+  #home .row .r-tt{display:block;font-size:16px;font-weight:700;color:#2b2310;margin-top:1px;}
+  #home .row .r-ar{font-size:18px;color:#cfbf95;font-weight:700;}
+
+  /* 계열/학교 바로가기 칩 */
+  #home .home-sec{margin-top:24px;}
+  #home .hs-head{font-family:var(--disp);font-weight:700;font-size:14px;color:#6b5526;margin:0 2px 11px;}
+  #home .hchips{display:flex;flex-wrap:wrap;gap:9px;}
+  #home .hchip{border:1px solid #efe5d0;background:#fff;color:#5a4a2a;
+    border-radius:var(--rad-pill);padding:10px 15px;font-size:14px;font-weight:600;cursor:pointer;
+    font-family:inherit;display:inline-flex;align-items:center;gap:7px;}
+  #home .hchip:active{background:#fbf3e3;}
+  #home .hchip .dot{width:9px;height:9px;border-radius:50%;background:var(--bc,#cbb98f);flex:0 0 auto;}
+
+  /* ===================== 랜딩(학년 선택) ===================== */
+  #landing{max-width:480px;margin:0 auto;height:100vh;height:100dvh;overflow:hidden;
+    background:linear-gradient(180deg,#DCEDFB 0%,#EAF4FC 45%,#F7FBFE 100%);}
+  #landing .lp{height:100vh;height:100dvh;display:flex;flex-direction:column;
+    padding:40px 24px calc(28px + env(safe-area-inset-bottom));}
+  #landing .lp-top{flex:0 0 auto;margin-top:44px;}
+  #landing .lp-title{font-family:var(--disp);font-weight:800;font-size:28px;line-height:1.25;
+    color:#1f3a52;letter-spacing:-.5px;}
+  #landing .lp-sub{font-size:15px;color:#5a7894;margin-top:10px;font-weight:600;}
+  #landing .lp-char{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;}
+  #landing .lp-char img{max-height:100%;max-width:78%;width:auto;height:auto;object-fit:contain;
+    filter:drop-shadow(0 16px 20px rgba(70,120,170,.25));animation:bob 3s ease-in-out infinite;}
+  #landing .lp-bubble{position:absolute;top:6px;right:4px;background:#fff;color:#3a4a5a;font-size:13px;
+    font-weight:600;padding:9px 14px;border-radius:16px 16px 4px 16px;box-shadow:0 6px 14px rgba(80,120,170,.18);}
+  #landing .lp-note-music{position:absolute;color:#9cc3e6;font-size:26px;}
+  #landing .l-n1{top:12%;left:30px;}
+  #landing .l-n2{top:30%;left:14px;font-size:20px;opacity:.8;}
+  #landing .lp-grades{flex:0 0 auto;display:flex;flex-direction:column;gap:12px;}
+  #landing .lp-grade{display:block;width:100%;text-align:center;background:#fff;border:1px solid #e4eef7;
+    border-radius:18px;padding:20px;cursor:pointer;font-family:inherit;font-size:18px;font-weight:800;
+    color:#1f3a52;box-shadow:0 8px 20px rgba(70,120,170,.10);}
+  #landing .lp-grade:active{transform:scale(.99);background:#fbfdff;}
+  #landing .lp-note{flex:0 0 auto;margin-top:14px;background:#fff7e0;border:1px solid #f6e6b8;color:#8a6d1e;
+    border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;}
+  #landing .lp-note a{color:#0f5aa0;font-weight:700;cursor:pointer;text-decoration:underline;}
+  /* 2학년 로그인 폼 */
+  #landing .lp-login{flex:0 0 auto;display:flex;flex-direction:column;gap:10px;}
+  #landing .lp-login-t{font-size:15px;font-weight:800;color:#1f3a52;margin-bottom:2px;}
+  #landing .lp-input{border:1px solid #cdddec;border-radius:14px;padding:15px 16px;font-size:16px;
+    font-family:inherit;background:#fff;color:#1f3a52;outline:none;}
+  #landing .lp-input:focus{border-color:#7fb1dc;}
+  #landing .lp-login-btn{border:0;background:#2b6cb0;color:#fff;border-radius:14px;padding:16px;
+    font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;}
+  #landing .lp-login-btn:active{filter:brightness(1.08);}
+  #landing .lp-login-err{background:#fce8ed;color:#8f3b50;border:1px solid #f6ccd6;border-radius:10px;
+    padding:10px 12px;font-size:13px;}
+  #landing .lp-back{border:0;background:transparent;color:#5a7894;font-size:13px;font-weight:600;
+    font-family:inherit;cursor:pointer;padding:4px;}
+  #landing .lp-skip{border:0;background:transparent;color:#2b6cb0;font-size:14px;font-weight:700;
+    font-family:inherit;cursor:pointer;padding:6px;text-decoration:underline;}
+
+  /* ===================== 마이페이지 ===================== */
+  #my{max-width:480px;margin:0 auto;min-height:100vh;background:#fff;padding-bottom:60px;}
+  #my .my-top{position:sticky;top:0;background:#fff;display:flex;align-items:center;
+    padding:12px 10px;border-bottom:1px solid var(--line);z-index:5;}
+  #my .m-back{width:40px;height:40px;border:0;background:transparent;color:#3a2e16;font-size:26px;
+    line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;}
+  #my .m-back:active{background:rgba(0,0,0,.05);border-radius:10px;}
+  #my .m-ttl{flex:1;text-align:center;font-weight:700;font-size:17px;color:#2b2310;}
+  #my .m-sp{width:40px;flex:0 0 auto;}
+  #my .my-prof{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 16px 20px;
+    background:linear-gradient(180deg,#E6F1FB 0%,#F4F9FE 70%,#fff 100%);}
+  #my .m-ava{width:98px;height:98px;border-radius:50%;background:#D7E9FA;display:flex;
+    align-items:flex-end;justify-content:center;overflow:hidden;box-shadow:0 8px 18px rgba(70,120,180,.22);}
+  #my .m-ava img{width:84%;height:84%;object-fit:contain;object-position:bottom;}
+  #my .m-ava-wrap{position:relative;border:0;background:transparent;padding:0;cursor:pointer;}
+  #my .m-ava-edit{position:absolute;right:2px;bottom:2px;width:30px;height:30px;border-radius:50%;
+    background:#fff;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;
+    font-size:14px;color:var(--stone);box-shadow:0 2px 6px rgba(0,0,0,.16);}
+  #my .m-ava-wrap:active .m-ava{filter:brightness(.96);}
+  /* 아바타 선택 팝업 */
+  .modal .ava-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+  .modal .ava-opt{border:2px solid var(--line);background:#EAF3FB;border-radius:16px;padding:8px;
+    cursor:pointer;display:flex;align-items:flex-end;justify-content:center;aspect-ratio:1/1;overflow:hidden;}
+  .modal .ava-opt img{width:90%;height:90%;object-fit:contain;object-position:bottom;}
+  .modal .ava-opt.on{border-color:var(--near);background:#D7E9FA;}
+  #my .m-nick{font-size:21px;font-weight:800;color:#2b2310;letter-spacing:-.3px;}
+  #my .m-edit{border:1px solid var(--line2);background:#fff;color:var(--stone);border-radius:999px;
+    padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+  #my .m-edit:active{background:var(--soft);}
+  #my .m-grade{font-size:13px;color:#5a7894;font-weight:700;}
+  #my .m-prof-btns{display:flex;gap:8px;}
+  #my .my-stats{display:flex;margin:16px;border:1px solid #e8eef5;border-radius:18px;overflow:hidden;
+    box-shadow:0 6px 18px rgba(80,110,150,.07);}
+  #my .m-stat{flex:1;text-align:center;padding:16px 8px;}
+  #my .m-stat+.m-stat{border-left:1px solid #eef2f7;}
+  #my .m-s-lab{font-size:13px;color:#5a6b80;font-weight:600;}
+  #my .m-s-num{font-size:23px;font-weight:800;color:#2b2310;margin-top:6px;}
+  #my .my-sec{padding:0 16px;}
+  #my .my-h{font-size:15px;font-weight:700;color:#2b2310;margin:16px 2px 11px;}
+  #my .my-card{border:1px solid #eef0ea;border-radius:16px;padding:18px 16px;
+    box-shadow:0 6px 18px rgba(120,90,30,.05);}
+  #my .my-card .chips{gap:8px;}
+  #my .my-empty{font-size:13px;color:var(--silver);text-align:center;padding:16px 6px;line-height:1.55;}
+  #my .my-semgrp{margin-top:20px;}
+  #my .my-semgrp:first-child{margin-top:0;}
+  #my .my-semlabel{font-size:12px;color:var(--mute);font-weight:600;margin-bottom:11px;
+    padding-bottom:7px;border-bottom:1px solid var(--line);}
+  #my .my-quota-note{margin-bottom:16px;}
+  #my .foot{font-size:11px;color:var(--silver);text-align:center;margin-top:22px;line-height:1.6;}
+
+  /* 가이드 헤더의 홈 버튼 */
+  .apptop{display:flex;align-items:center;margin-bottom:8px;}
+  .back{border:0;background:transparent;font-size:15px;font-weight:600;color:var(--stone);
+    cursor:pointer;padding:4px 6px 4px 0;font-family:inherit;display:inline-flex;align-items:center;gap:3px;}
+  .back .chev{font-size:20px;line-height:1;}
+</style>
+</head>
+<body>
+
+<!-- ===================== LANDING (학년 선택) ===================== -->
+<div id="landing" class="screen" hidden>
+  <div class="lp">
+    <div class="lp-top">
+      <div class="lp-title">나에게 맞는<br>선택과목 찾기</div>
+      <div class="lp-sub">학년을 선택하고 시작해요!</div>
+    </div>
+    <div class="lp-char">
+      <span class="lp-note-music l-n1">♪</span><span class="lp-note-music l-n2">♬</span>
+      <img src="img/character4.png" alt="속초고 캐릭터" onerror="this.style.display='none'">
+    </div>
+    <div class="lp-grades" id="lpGrades">
+      <button class="lp-grade" data-grade="1">1학년</button>
+      <button class="lp-grade" data-grade="2">2학년</button>
+    </div>
+    <div class="lp-login" id="lpLogin" hidden>
+      <div class="lp-login-t" id="lpLoginT">2학년 로그인</div>
+      <input class="lp-input" id="lpHak" type="tel" inputmode="numeric" maxlength="5" placeholder="학번 5자리 (예: 20101)">
+      <input class="lp-input" id="lpName" type="text" placeholder="이름">
+      <div class="lp-login-err" id="lpErr" hidden></div>
+      <button class="lp-login-btn" id="lpLoginBtn">확인</button>
+      <button class="lp-skip" id="lpSkip">로그인 없이 둘러보기</button>
+      <button class="lp-back" id="lpBack">‹ 학년 다시 선택</button>
+    </div>
+    <div class="lp-note" id="lpNote" hidden></div>
+  </div>
+</div>
+
+<!-- ===================== HOME (메인) ===================== -->
+<div id="home" class="screen">
+  <!-- 헤더 -->
+  <div class="hdr">
+    <span class="ico" aria-hidden="true"></span>
+    <div class="h-title">선택과목 신청 가이드</div>
+    <div class="h-right">
+      <button class="ico" id="goSettings" aria-label="설정">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 히어로: 살펴본 추천과목 -->
+  <div class="hero">
+    <div class="label" id="homeLabel">지금까지 선택한 과목</div>
+    <div class="count">
+      <span class="num" data-picked-count>0</span>
+      <span class="unit">과목</span>
+    </div>
+    <div class="stage">
+      <img class="leaf l1" src="img/school.png" alt="" aria-hidden="true">
+      <img class="leaf l2" src="img/pen.png" alt="" aria-hidden="true">
+      <img class="leaf l3" src="img/book.png" alt="" aria-hidden="true">
+      <div class="shadow"></div>
+      <img class="char" id="homeChar" src="img/character1.png" alt="속초고 수달 캐릭터" onerror="this.style.display='none'">
+    </div>
+  </div>
+
+  <!-- 진행바 + 마일스톤 -->
+  <div class="progress">
+    <div class="bar">
+      <div class="fill"></div>
+      <span class="dot" style="left:13%"></span>
+      <span class="dot" style="left:38%"></span>
+      <span class="dot" style="left:63%"></span>
+      <span class="dot" style="left:88%"></span>
+    </div>
+    <div class="ticks">
+      <div class="tick off"><div class="t-lab">2-1</div><button class="t-btn">🔒 잠김</button></div>
+      <div class="tick off"><div class="t-lab">2-2</div><button class="t-btn">🔒 잠김</button></div>
+      <div class="tick off"><div class="t-lab">3-1</div><button class="t-btn">🔒 잠김</button></div>
+      <div class="tick off"><div class="t-lab">3-2</div><button class="t-btn">🔒 잠김</button></div>
+    </div>
+  </div>
+
+  <!-- 본문 -->
+  <div class="hbody">
+    <div class="stat-row">
+      <div class="stat to-my" data-pop="pick">
+        <div class="s-top">내가 담은 과목 <span class="chev">›</span></div>
+        <div class="s-val"><img class="e" src="img/pin.png" alt="" aria-hidden="true"><span class="n" data-picked-count>0</span></div>
+      </div>
+      <div class="stat to-my" data-pop="gye">
+        <div class="s-top">관심 계열 <span class="chev">›</span></div>
+        <div class="s-val"><img class="e" src="img/compass.png" alt="" aria-hidden="true"><span class="n" data-gye-count>0</span></div>
+      </div>
+    </div>
+
+    <div class="list-card">
+      <button class="row" data-go="gye">
+        <span class="r-ic"><img src="img/compass.png" alt="" aria-hidden="true"></span>
+        <span class="r-tx"><span class="r-sub">관심 계열의 대학별 추천과목을 한눈에</span><span class="r-tt">계열별로 보기</span></span>
+        <span class="r-ar">›</span>
+      </button>
+      <button class="row" data-go="uni">
+        <span class="r-ic"><img src="img/school.png" alt="" aria-hidden="true"></span>
+        <span class="r-tx"><span class="r-sub">6개 대학 · 계열별 추천과목을 한눈에</span><span class="r-tt">학교별로 보기</span></span>
+        <span class="r-ar">›</span>
+      </button>
+      <button class="row" id="guidebookRow">
+        <span class="r-ic"><img src="img/book.png" alt="" aria-hidden="true"></span>
+        <span class="r-tx"><span class="r-sub" id="gbSub">학년별 선택과목 가이드북(전자책)</span><span class="r-tt">가이드북 바로가기</span></span>
+        <span class="r-ar">›</span>
+      </button>
+    </div>
+
+    <div class="home-sec">
+      <div class="hs-head">계열 바로가기</div>
+      <div class="hchips" id="homeGye"></div>
+    </div>
+
+    <div class="home-sec">
+      <div class="hs-head">학교 바로가기</div>
+      <div class="hchips" id="homeUni"></div>
+    </div>
+
+    <div class="foot">
+      © 2026 사이음(sci_eum). 과학의 사이, 사람을 잇다.
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MY (마이페이지) ===================== -->
+<div id="my" class="screen" hidden>
+  <div class="my-top">
+    <button class="m-back" id="myBack" aria-label="홈으로">‹</button>
+    <div class="m-ttl">마이페이지</div>
+    <span class="m-sp"></span>
+  </div>
+
+  <div class="my-prof">
+    <button class="m-ava-wrap" id="myAvaBtn" aria-label="프로필 사진 변경">
+      <span class="m-ava"><img id="myAva" src="img/character1.png" alt="프로필 캐릭터" onerror="this.style.display='none'"></span>
+      <span class="m-ava-edit">✎</span>
+    </button>
+    <div class="m-nick" id="myNick">속초고 학생</div>
+    <div class="m-grade" id="myGradeLabel"></div>
+    <div class="m-prof-btns">
+      <button class="m-edit" id="myEdit">내 정보 수정</button>
+      <button class="m-edit" id="myGrade">학년 변경</button>
+    </div>
+  </div>
+
+  <div class="my-stats">
+    <div class="m-stat"><div class="m-s-lab">담은 과목</div><div class="m-s-num"><span data-picked-count>0</span>개</div></div>
+    <div class="m-stat"><div class="m-s-lab">관심 계열</div><div class="m-s-num"><span data-gye-count>0</span>개</div></div>
+  </div>
+
+  <div class="my-sec">
+    <div class="my-h">내가 담은 과목</div>
+    <div class="my-card" id="myPicked"></div>
+  </div>
+
+  <div class="foot">
+    © 2026 사이음(sci_eum). 과학의 사이, 사람을 잇다.
+  </div>
+</div>
+
+<!-- ===================== APP (가이드) ===================== -->
+<div id="app" class="screen" hidden>
+<div class="wrap">
+  <header>
+    <div class="apptop"><button class="back" id="goHome" aria-label="홈으로"><span class="chev">‹</span>홈</button></div>
+    <h1>계열별 추천과목 가이드</h1>
+    <div class="sub">속초고 학생용 · 가고 싶은 계열을 고르면 대학별 추천과목과 우리 학교 개설 학기가 보여요</div>
+    <div class="modes">
+      <div class="mode on" data-mode="gye">계열별로 보기</div>
+      <div class="mode" data-mode="uni">학교별로 보기</div>
+    </div>
+    <div class="picker" id="picker"></div>
+    <div class="controls">
+      <label class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="text" placeholder="학과·과목 검색 (예: 컴퓨터, 미적분)">
+      </label>
+      <div class="toggle" id="onlyOpen"><span class="sw"></span><span>개설만</span></div>
+    </div>
+  </header>
+
+  <main id="results"></main>
+
+  <div class="legend">
+    <h3>편제 표시 안내 <span style="font-size:11px;color:var(--silver);font-weight:400">2026학년도 입학생 기준</span></h3>
+    <div class="row"><span class="chip open"><span class="nm">역학과 에너지</span><span class="g">2학년 2학기</span></span> 속초고 개설 — 표시된 학기에 수강 가능</div>
+    <div class="row"><span class="chip none"><span class="nm">고급물리학</span><span class="g">미개설</span></span> 속초고 미개설 — 온라인·공동교육과정 등 별도 이수</div>
+    <div class="row"><span class="chip area"><span class="nm">사회문화</span></span> 교과영역(과목군) — 특정 과목이 아닌 관련 일반 권장</div>
+    <div class="row" style="display:block"><b style="font-weight:500;color:var(--near)">핵심과목</b> 대학이 특히 강조하는 과목 · <b style="font-weight:500;color:var(--near)">권장과목</b> 함께 들으면 좋은 과목</div>
+  </div>
+
+  <div class="foot">
+    © 2026 사이음(sci_eum). 과학의 사이, 사람을 잇다.
+  </div>
+</div>
+</div><!-- /#app -->
+
+<div class="modal-back" id="modalBack" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="data_students.js"></script>
+<script src="data_students1.js"></script>
+<script>
+(function(){
+  const {PROGRAMS, GUIDE, GYE, lookupSubject} = window.APPDATA;
+  const UNIS = ['중앙대학교','고려대학교','동국대학교','경희대학교','서울대학교','건국대학교'];
+  const LOGO = {
+    '중앙대학교':'logo/CAU.svg', '고려대학교':'logo/KOREA.png', '동국대학교':'logo/dongguk.jpg',
+    '경희대학교':'logo/KYUNGHEE.jpg', '서울대학교':'logo/SNU.png', '건국대학교':'logo/KU.png'
+  };
+  /* 학교별 대표(상징) 색상 */
+  const BRAND = {
+    '중앙대학교':'#003DA5',  // CAU 블루
+    '고려대학교':'#862633',  // 크림슨
+    '동국대학교':'#E06C16',  // 동국 오렌지
+    '경희대학교':'#8A1E2D',  // 경희 크림슨
+    '서울대학교':'#003087',  // SNU 블루
+    '건국대학교':'#006A3C'   // 건국 그린
+  };
+  const brandOf = u => BRAND[u] || '#e5e5e5';
+  const accent  = u => ` style="background:${brandOf(u)}1A"`;  /* 브랜드색 ~10% 틴트 배경 */
+  PROGRAMS.forEach((p,i)=>{ p._id=i; });
+
+  /* ---- 담은 과목: 캐시(localStorage) 사용, 별도 저장소 없음 ---- */
+  const PICK_KEY='sokcho_picked_v1';
+  function pickKey(){ const id=getStu(); return id ? 'sokcho_pick_'+id : PICK_KEY; }   /* 학생별 분리 저장 */
+  function getPicked(){ try{ return JSON.parse(localStorage.getItem(pickKey()))||[]; }catch(e){ return []; } }
+  function setPicked(a){ try{ localStorage.setItem(pickKey(), JSON.stringify(a)); }catch(e){} }
+  function isPicked(n){ return getPicked().includes(n); }
+  /* 로그인한 2학년 학생의 확정 과목(2학년 1·2학기) — 변경 불가(잠금) */
+  function lockedSet(){
+    try{ const id=localStorage.getItem(STU_KEY); if(!id) return new Set();
+      const s=(window.STUDENTS||{})[id]; if(!s) return new Set();
+      return new Set([...(s.s1||[]),...(s.s2||[])]);
+    }catch(e){ return new Set(); }
+  }
+  function isLocked(n){ return lockedSet().has(n); }
+  /* 확정 과목은 학생의 실제 수강 학기(s1=2학년 1학기, s2=2학년 2학기)로 분류 */
+  function lockedSemOf(n){
+    try{ const id=localStorage.getItem(STU_KEY); if(!id) return null;
+      const s=(window.STUDENTS||{})[id]; if(!s) return null;
+      if((s.s1||[]).includes(n)) return '2학년 1학기';
+      if((s.s2||[]).includes(n)) return '2학년 2학기';
+      return null;
+    }catch(e){ return null; }
+  }
+  /* 로그인 직후: 확정 과목을 담긴 상태로 병합 */
+  function seedLockedPicks(){
+    const lk=[...lockedSet()]; if(!lk.length) return;
+    const a=getPicked(); let changed=false;
+    lk.forEach(n=>{ if(!a.includes(n)){ a.push(n); changed=true; } });
+    if(changed) setPicked(a);
+  }
+  function togglePick(n){
+    if(isLocked(n)) return;   // 확정된 2학년 과목은 빼기 불가
+    const a=getPicked(); const i=a.indexOf(n);
+    if(i>=0) a.splice(i,1); else a.push(n);
+    setPicked(a); updatePickedUI();
+  }
+  function pickedGyeList(){
+    const picked=new Set(getPicked());
+    if(!picked.size) return [];
+    const gset=new Set();
+    PROGRAMS.forEach(p=>{
+      const subs=[...p.core,...p.rec].flatMap(expand);
+      if(subs.some(s=>picked.has(s))) gset.add(p.g);
+    });
+    return GYE.filter(g=>gset.has(g));
+  }
+  function pickedGyeCount(){ return pickedGyeList().length; }
+
+  /* ---- 학기별 선택 기준: 2학년 학기별 4과목 · 3학년 학기별 6과목 (총 20) ---- */
+  const QUOTA={'2학년 1학기':4,'2학년 2학기':4,'3학년 1학기':6,'3학년 2학기':6};
+  const SEM_ORDER=['2학년 1학기','2학년 2학기','3학년 1학기','3학년 2학기'];
+  const SEM_SHORT={'2학년 1학기':'2-1','2학년 2학기':'2-2','3학년 1학기':'3-1','3학년 2학기':'3-2'};
+  function pickedBySem(){
+    const m={}; SEM_ORDER.forEach(l=>m[l]=0);
+    getPicked().forEach(n=>{ const lo=lockedSemOf(n);
+      if(lo){ if(lo in m) m[lo]++; return; }
+      const s=lookupSubject(n);
+      if(s.status==='open'){ const l=ORD_LABEL[semOrd(s.label)]; if(l in m) m[l]++; } });
+    return m;
+  }
+  function semLabelHtml(label,count){
+    if(QUOTA[label]==null) return label;
+    const q=QUOTA[label], cls = count>q?'over':(count>=q?'done':'');
+    return `${label} <span class="q-cnt ${cls}">${count}/${q}</span>`;
+  }
+  function updateMilestones(){
+    const counts=pickedBySem();
+    let filled=0,total=0;
+    SEM_ORDER.forEach(l=>{ filled+=Math.min(counts[l],QUOTA[l]); total+=QUOTA[l]; });
+    const fill=document.querySelector('#home .bar .fill'); if(fill) fill.style.width=Math.round(filled/total*100)+'%';
+    const ticks=document.querySelector('#home .ticks');
+    if(ticks){
+      ticks.innerHTML=SEM_ORDER.map(l=>{
+        const n=counts[l], q=QUOTA[l], met=n>=q;
+        return `<div class="tick${n===0?' off':''}" data-sem="${l}"><div class="t-lab">${SEM_SHORT[l]}</div>`+
+          `<button class="t-btn">${met?'🏅 달성':n+'/'+q}</button></div>`;
+      }).join('');
+    }
+  }
+  function renderPickedList(){
+    const box=document.getElementById('myPicked'); if(!box) return;
+    const arr=getPicked();
+    const note='<div class="my-quota-note">학기별 선택 기준 · 2학년 4과목 / 3학년 6과목</div>';
+    if(!arr.length){ box.innerHTML=note+'<div class="my-empty">아직 담은 과목이 없어요.<br>추천과목에서 과목을 탭해 담아보세요.</div>'; return; }
+    box.innerHTML=note+semBuckets(arr).map(grp=>`<div class="my-semgrp"><div class="my-semlabel">${semLabelHtml(grp.label, grp.items.length)}</div>`+
+      `<div class="chips">${grp.items.map(n=>chip(n,true)).join('')}</div></div>`).join('');
+  }
+  function updatePickedUI(){
+    const c=getPicked().length;
+    document.querySelectorAll('[data-picked-count]').forEach(el=>{ el.textContent=c; });
+    const g=pickedGyeCount();
+    document.querySelectorAll('[data-gye-count]').forEach(el=>{ el.textContent=g; });
+    renderPickedList();
+    updateMilestones();
+  }
+
+  /* 닉네임 — 캐시 저장 */
+  const NICK_KEY='sokcho_nick_v1';
+  const STU_KEY='sokcho_stu_v1';
+  function getStu(){ try{ return localStorage.getItem(STU_KEY)||''; }catch(e){ return ''; } }
+  function setStu(id){ try{ id? localStorage.setItem(STU_KEY,id) : localStorage.removeItem(STU_KEY); }catch(e){} }
+  function isG2(){ return !!(window.STUDENTS && window.STUDENTS[getStu()]); }   /* 로그인한 2학년 학생 */
+  function getNick(){ try{ return localStorage.getItem(NICK_KEY) || '속초고 학생'; }catch(e){ return '속초고 학생'; } }
+  function setNick(v){ try{ localStorage.setItem(NICK_KEY, v); }catch(e){}
+    const el=document.getElementById('myNick'); if(el) el.textContent=v;
+    const hl=document.getElementById('homeLabel'); if(hl) hl.textContent=v+' 학생이 지금까지 선택한 과목'; }
+
+  /* 프로필 아바타 — 캐시 저장 */
+  const AVA_KEY='sokcho_ava_v1';
+  const AVATARS=['img/character1.png','img/character2.png','img/character3.png','img/character4.png','img/character5.png'];
+  function getAva(){ try{ return localStorage.getItem(AVA_KEY)||AVATARS[0]; }catch(e){ return AVATARS[0]; } }
+  function applyAva(){ const a=getAva();
+    const el=document.getElementById('myAva'); if(el) el.src=a;
+    const hc=document.getElementById('homeChar'); if(hc) hc.src=a; }   /* 히어로 캐릭터 동기화 */
+  function setAva(src){ try{ localStorage.setItem(AVA_KEY, src); }catch(e){} applyAva(); }
+
+  const state = { mode:'gye', sel:GYE[0], q:'', onlyOpen:false };
+
+  const picker  = document.getElementById('picker');
+  const results = document.getElementById('results');
+  const qInput  = document.getElementById('q');
+  const onlyEl  = document.getElementById('onlyOpen');
+  const modalBack = document.getElementById('modalBack');
+  const modal   = document.getElementById('modal');
+
+  /* '물리학 또는 화학', 'A/B' 같은 복합 표기를 개별 과목으로 분리 */
+  function expand(name){
+    return String(name).split(/\s*또는\s*|\s*\/\s*/).map(s=>s.trim()).filter(Boolean);
+  }
+
+  /* 학기 라벨 → 정렬 순번 (가장 이른 학기 기준) */
+  function semOrd(label){
+    const m=String(label).match(/([123])학년\s*([12])/);
+    return m ? (Number(m[1])-1)*2 + Number(m[2]) : 99;
+  }
+  const ORD_LABEL={1:'1학년 1학기',2:'1학년 2학기',3:'2학년 1학기',4:'2학년 2학기',5:'3학년 1학기',6:'3학년 2학기'};
+  function subjOrd(name){
+    const lo=lockedSemOf(name); if(lo) return semOrd(lo);
+    const s=lookupSubject(name);
+    if(s.status==='open') return semOrd(s.label);
+    if(s.status==='none') return 100;   // 미개설
+    return 101;                          // 교과영역
+  }
+
+  /* ---- chip html for a subject (개별 과목) ---- */
+  function chip(name, force){
+    const s = lookupSubject(name);
+    let cls='area', grade='';
+    if (s.status==='open'){ cls='open'; grade = lockedSemOf(name) || s.label; }
+    else if (s.status==='none'){ cls='none'; grade='미개설'; }
+    if (!force && state.onlyOpen && cls!=='open') return '';
+    const lk = isLocked(name);
+    // 로그인한 2학년 학생: 2학년 전용 과목은 신청 불가(3학년만), 확정 과목은 빼기 불가
+    const blocked = lk || (isG2() && s.status==='open' && /2학년/.test(s.label) && !/3학년/.test(s.label));
+    const on = (lk || isPicked(name)) ? ' picked' : '';
+    const lc = blocked ? ' locked' : '';
+    return `<span class="chip ${cls}${on}${lc}" data-name="${name}"${blocked?' data-locked="1"':''}><span class="nm">${name}</span>${grade?`<span class="g">${grade}</span>`:''}</span>`;
+  }
+
+  /* 학기순 정렬된 칩 모음 */
+  function chipSet(list){
+    const seen=new Set();
+    const items=list.flatMap(expand)
+      .filter(n=>{ const k=n.trim(); if(seen.has(k)) return false; seen.add(k); return true; })
+      .map(n=>({n, o:subjOrd(n)}))
+      .sort((a,b)=>a.o-b.o);   // 1학년→2학년→3학년→미개설→교과영역
+    return items.map(it=>chip(it.n)).filter(Boolean).join('');
+  }
+
+  /* 과목을 학기별 그룹으로 묶기 (모달용) */
+  function semesterGroups(p){
+    const buckets={}, order=[]; const seen=new Set();
+    [...p.core,...p.rec].flatMap(expand).forEach(name=>{
+      const k=name.trim(); if(seen.has(k))return; seen.add(k);
+      const lo=lockedSemOf(name);
+      const s=lookupSubject(name);
+      let label;
+      if(lo) label=lo;
+      else if(s.status==='open') label=ORD_LABEL[semOrd(s.label)]||s.label;
+      else if(s.status==='none') label='속초고 미개설';
+      else label='관련 교과영역';
+      if(!buckets[label]){ buckets[label]=[]; order.push(label); }
+      buckets[label].push(name);
+    });
+    const LO={'1학년 1학기':1,'1학년 2학기':2,'2학년 1학기':3,'2학년 2학기':4,'3학년 1학기':5,'3학년 2학기':6,'속초고 미개설':100,'관련 교과영역':101};
+    order.sort((a,b)=>(LO[a]||50)-(LO[b]||50));
+    return order.map(l=>({label:l, items:buckets[l]}));
+  }
+
+  /* count open/none/area among rec+core (중복 제거) */
+  function countStatus(p){
+    let open=0,none=0,area=0; const seen=new Set();
+    [...p.core,...p.rec].flatMap(expand).forEach(n=>{
+      const k=n.trim(); if(seen.has(k))return; seen.add(k);
+      const s=lookupSubject(n).status;
+      if(s==='open')open++; else if(s==='none')none++; else area++;
+    });
+    return {open,none,area};
+  }
+
+  function uniHead(u,f){
+    const logo = LOGO[u] ? `<img class="logo" src="${LOGO[u]}" alt="">` : '';
+    return `<div class="uni"><span class="uleft">${logo}<span class="name" style="color:${brandOf(u)}">${u}</span></span><span class="field">${f}</span></div>`;
+  }
+
+  /* 카드 디스패치: 모든 학교를 클릭형(팝업)으로 통일 */
+  function card(p){
+    return cauCard(p);
+  }
+
+  /* ---- 중앙대: 설명형 클릭 카드 (탭하면 모달) ---- */
+  function cauCard(p){
+    const c = countStatus(p);
+    if (state.onlyOpen && c.open===0) return '';
+    return `<div class="card cau" data-id="${p._id}"${accent(p.u)}>
+      ${uniHead(p.u,p.f)}
+      <div class="mojip">${p.mojip}</div>
+      ${p.desc?`<div class="desc">${p.desc}</div>`:(p.col&&p.col!==p.mojip?`<div class="desc">${p.col}</div>`:'')}
+      <div class="cau-foot">
+        <span class="meta">속초고 개설 ${c.open}${c.none?` · 미개설 ${c.none}`:''}</span>
+        <span class="more" style="color:${brandOf(p.u)}">추천과목 보기 →</span>
+      </div>
+    </div>`;
+  }
+
+  /* ---- render one program card (인라인) ---- */
+  function programCard(p){
+    const hasCore = p.core.length>0;
+    let coreHtml = hasCore ? chipSet(p.core) : '';
+    let recHtml  = chipSet(p.rec);
+    if (state.onlyOpen && !coreHtml && !recHtml) return '';
+    const c = countStatus(p);
+    return `<div class="card"${accent(p.u)}>
+      ${uniHead(p.u,p.f)}
+      <div class="mojip">${p.mojip}</div>
+      ${p.note?`<div class="note">※ ${p.note}</div>`:''}
+      <div class="meta">속초고 개설 ${c.open}${c.none?` · 미개설 ${c.none}`:''}${c.area?` · 교과영역 ${c.area}`:''}</div>
+      ${coreHtml?`<div class="grp">핵심과목</div><div class="chips">${coreHtml}</div>`:''}
+      ${recHtml?`<div class="grp">${hasCore?'권장과목':'권장 이수과목'}</div><div class="chips">${recHtml}</div>`:''}
+    </div>`;
+  }
+
+  function guideCard(c){
+    return `<div class="card guide"${accent(c.u)}>
+      ${uniHead(c.u,c.f)}
+      ${c.lines.map(l=>`<div class="ln${/^[【·※]|^모집|^진로|^융합|^수학|^과학|^추천/.test(l)?' h':''}">${l}</div>`).join('')}
+    </div>`;
+  }
+
+  /* ---- 모달 (중앙대 추천과목, 학기별) — 과목 담기 인터페이스 ---- */
+  let modalP=null, modalMode='program', modalSem=null;
+  function modalSubjects(p){ return new Set([...p.core,...p.rec].flatMap(expand)); }
+  function updateModalCount(){
+    const n=modal.querySelectorAll('.chip.picked').length;
+    const el=document.getElementById('mPickCnt'); if(el) el.textContent=n;
+    const btn=document.getElementById('mPickBtn'); if(btn) btn.textContent = n>0 ? '+ 담기 '+n : '+ 담기';
+  }
+  function commitModalPicks(){
+    if(!modalP) return;
+    const subs=modalSubjects(modalP);
+    let arr=getPicked().filter(n=>!subs.has(n));   // 이 학과의 기존 선택 제거 후
+    modal.querySelectorAll('.chip.picked[data-name]').forEach(ch=>{   // 현재 선택분 반영
+      const n=ch.dataset.name; if(!arr.includes(n)) arr.push(n);
+    });
+    lockedSet().forEach(n=>{ if(!arr.includes(n)) arr.push(n); });   // 확정 과목은 항상 유지
+    setPicked(arr); updatePickedUI(); closeModal();
+  }
+  function openModal(p){
+    modalP=p; modalMode='program';
+    const c = countStatus(p);
+    const groups = semesterGroups(p);
+    const hasCore = p.core.length>0;
+    modal.innerHTML = `
+      <div class="grab" style="background:${brandOf(p.u)}"></div>
+      <div class="mtop"><span class="mclose" id="mclose">닫기 ✕</span></div>
+      <div class="mhead">${LOGO[p.u]?`<img class="logo" src="${LOGO[p.u]}" alt="">`:''}
+        <div><div class="muni" style="color:${brandOf(p.u)}">${p.u} · ${p.f}</div><div class="mmojip">${p.mojip}</div></div></div>
+      ${p.desc?`<div class="mdesc">${p.desc}</div>`:''}
+      ${p.note?`<div class="note">※ ${p.note}</div>`:''}
+      <div class="mmeta">속초고 개설 ${c.open}${c.none?` · 미개설 ${c.none}`:''}${c.area?` · 교과영역 ${c.area}`:''}${hasCore?' · 핵심 '+p.core.length:''}</div>
+      <div class="mpick">담을 과목을 선택한 뒤 <b>+ 담기</b>를 누르세요 · 선택 <b id="mPickCnt">0</b>개</div>
+      ${groups.map(grp=>`<div class="semgrp"><div class="semlabel">${grp.label}</div>
+        <div class="chips">${grp.items.map(n=>chip(n,true)).join('')}</div></div>`).join('')}
+      <div class="mpick-bar"><button class="mpick-btn" id="mPickBtn">+ 담기</button></div>
+    `;
+    updateModalCount();
+    modalBack.hidden=false;
+    document.body.style.overflow='hidden';
+  }
+  function closeModal(){ modalBack.hidden=true; document.body.style.overflow=''; modalP=null; modalMode='program'; modalSem=null; }
+
+  /* 학기 마일스톤 클릭 → 그 학기에 담은 과목 팝업 */
+  function openSemModal(label){
+    modalMode='sem'; modalP=null; modalSem=label;
+    const picks=getPicked().filter(n=>{ const lo=lockedSemOf(n); if(lo) return lo===label; const s=lookupSubject(n); return s.status==='open' && ORD_LABEL[semOrd(s.label)]===label; });
+    const q=QUOTA[label]||0, cls=picks.length>q?'over':(picks.length>=q?'done':'');
+    const body = !picks.length
+      ? '<div class="pop-empty">아직 이 학기에 담은 과목이 없어요.<br>학교 카드를 눌러 과목을 담아보세요.</div>'
+      : '<div class="chips">'+picks.map(n=>chip(n,true)).join('')+'</div>';
+    modal.innerHTML = `
+      <div class="grab"></div>
+      <div class="mtop"><span class="mclose" id="mclose">닫기 ✕</span></div>
+      <div class="mhead"><div><div class="mmojip">${label}</div><div class="muni">담은 과목 <span class="q-cnt ${cls}">${picks.length}/${q}</span>${picks.length?' · 칩을 탭하면 빼기':''}</div></div></div>
+      ${body}`;
+    modalBack.hidden=false; document.body.style.overflow='hidden';
+  }
+
+  /* ---- 홈 통계 팝업: 담은 과목(학기별) / 관심 계열 ---- */
+  function semBuckets(arr){
+    const buckets={}, order=[];
+    arr.forEach(name=>{ const lo=lockedSemOf(name); const s=lookupSubject(name); let label;
+      if(lo) label=lo;
+      else if(s.status==='open') label=ORD_LABEL[semOrd(s.label)]||s.label;
+      else if(s.status==='none') label='속초고 미개설'; else label='관련 교과영역';
+      if(!buckets[label]){ buckets[label]=[]; order.push(label); } buckets[label].push(name); });
+    const LO={'1학년 1학기':1,'1학년 2학기':2,'2학년 1학기':3,'2학년 2학기':4,'3학년 1학기':5,'3학년 2학기':6,'속초고 미개설':100,'관련 교과영역':101};
+    order.sort((a,b)=>(LO[a]||50)-(LO[b]||50));
+    return order.map(l=>({label:l, items:buckets[l]}));
+  }
+  function openPickModal(){
+    modalMode='pick'; modalP=null;
+    const arr=getPicked();
+    const body = !arr.length
+      ? '<div class="pop-empty">아직 담은 과목이 없어요.<br>학교 카드를 눌러 과목을 담아보세요.</div>'
+      : semBuckets(arr).map(grp=>`<div class="semgrp"><div class="semlabel">${semLabelHtml(grp.label, grp.items.length)}</div>
+          <div class="chips">${grp.items.map(n=>chip(n,true)).join('')}</div></div>`).join('');
+    modal.innerHTML = `
+      <div class="grab"></div>
+      <div class="mtop"><span class="mclose" id="mclose">닫기 ✕</span></div>
+      <div class="mhead"><img class="e-pop" src="img/pin.png" alt="" aria-hidden="true">
+        <div><div class="mmojip">내가 담은 과목</div><div class="muni">총 ${arr.length}과목 · 2학년 4과목 / 3학년 6과목</div></div></div>
+      ${body}`;
+    modalBack.hidden=false; document.body.style.overflow='hidden';
+  }
+  function openGyeModal(){
+    modalMode='gye'; modalP=null;
+    const list=pickedGyeList();
+    const body = !list.length
+      ? '<div class="pop-empty">담은 과목이 생기면<br>관심 계열이 표시돼요.</div>'
+      : '<div class="gye-pop">'+list.map(g=>`<button class="gye-chip" data-sel="${g}">${g} 계열 보기 ›</button>`).join('')+'</div>';
+    modal.innerHTML = `
+      <div class="grab"></div>
+      <div class="mtop"><span class="mclose" id="mclose">닫기 ✕</span></div>
+      <div class="mhead"><img class="e-pop" src="img/compass.png" alt="" aria-hidden="true">
+        <div><div class="mmojip">관심 계열</div><div class="muni">담은 과목 기준 ${list.length}개 · 탭하면 가이드로 이동</div></div></div>
+      ${body}`;
+    modalBack.hidden=false; document.body.style.overflow='hidden';
+  }
+  function openAvatarModal(){
+    modalMode='avatar'; modalP=null;
+    const cur=getAva();
+    const grid=AVATARS.map((src,i)=>`<button class="ava-opt${src===cur?' on':''}" data-src="${src}">
+      <img src="${src}" alt="캐릭터 ${i+1}" onerror="this.style.display='none'"></button>`).join('');
+    modal.innerHTML = `
+      <div class="grab"></div>
+      <div class="mtop"><span class="mclose" id="mclose">닫기 ✕</span></div>
+      <div class="mhead"><div><div class="mmojip">프로필 사진 선택</div><div class="muni">마음에 드는 캐릭터를 골라보세요</div></div></div>
+      <div class="ava-grid">${grid}</div>`;
+    modalBack.hidden=false; document.body.style.overflow='hidden';
+  }
+
+  function matchQ(p){
+    if(!state.q) return true;
+    const hay = (p.u+' '+p.f+' '+p.col+' '+p.mojip+' '+(p.desc||'')+' '+p.core.join(' ')+' '+p.rec.join(' ')).toLowerCase();
+    return hay.includes(state.q.toLowerCase());
+  }
+
+  /* ---- render ---- */
+  function render(){
+    // picker buttons
+    const items = state.mode==='gye' ? GYE : UNIS;
+    picker.innerHTML = items.map(x=>`<div class="pick${x===state.sel?' on':''}" data-v="${x}">${x}</div>`).join('');
+
+    let html='';
+    if(state.mode==='gye'){
+      const list = PROGRAMS.filter(p=>p.g===state.sel && matchQ(p));
+      const guides = (GUIDE[state.sel]||[]);
+      html += `<div class="gye-head">${state.sel} 계열 <span class="cnt">대학별 추천과목</span></div>`;
+      // group by university order
+      let body='';
+      UNIS.forEach(u=>{
+        const cards = list.filter(p=>p.u===u).map(card).filter(Boolean).join('');
+        if(cards) body+=cards;
+      });
+      const g = guides.map(guideCard).join('');
+      html += (body+g) || `<div class="empty">조건에 맞는 추천과목이 없어요.</div>`;
+    } else {
+      const list = PROGRAMS.filter(p=>p.u===state.sel && matchQ(p));
+      html += `<div class="gye-head">${state.sel} <span class="cnt">계열별 추천과목</span></div>`;
+      let body='';
+      GYE.forEach(g=>{
+        const cards = list.filter(p=>p.g===g).map(card).filter(Boolean).join('');
+        if(cards) body += `<div class="grp" style="font-size:13px;color:var(--near);margin:14px 0 6px;font-weight:500;">${g}</div>`+cards;
+      });
+      // guides for this university
+      let gcards='';
+      Object.values(GUIDE).flat().forEach(c=>{ if(c.u===state.sel && !gcards.includes(c.f)) {} });
+      const seen=new Set();
+      Object.values(GUIDE).flat().forEach(c=>{ if(c.u===state.sel){const key=c.f+c.lines[0]; if(!seen.has(key)){seen.add(key); gcards+=guideCard(c);}} });
+      html += (body+gcards) || `<div class="empty">조건에 맞는 추천과목이 없어요.</div>`;
+    }
+    results.innerHTML = html;
+  }
+
+  /* ---- events ---- */
+  document.querySelectorAll('.mode').forEach(m=>m.addEventListener('click',()=>{
+    document.querySelectorAll('.mode').forEach(x=>x.classList.remove('on'));
+    m.classList.add('on');
+    state.mode=m.dataset.mode;
+    state.sel = state.mode==='gye'?GYE[0]:UNIS[0];
+    render();
+  }));
+  picker.addEventListener('click',e=>{
+    const b=e.target.closest('.pick'); if(!b)return;
+    state.sel=b.dataset.v; render();
+  });
+  qInput.addEventListener('input',()=>{ state.q=qInput.value.trim(); render(); });
+  onlyEl.addEventListener('click',()=>{
+    state.onlyOpen=!state.onlyOpen; onlyEl.classList.toggle('on',state.onlyOpen); render();
+  });
+
+  /* 과목 칩 탭 → 담기 토글 (인라인 카드) */
+  results.addEventListener('click',e=>{
+    const ch=e.target.closest('.chip');
+    if(ch && ch.dataset.name){ if(ch.dataset.locked) return; togglePick(ch.dataset.name); ch.classList.toggle('picked'); return; }
+    const el=e.target.closest('.card.cau'); if(!el) return;
+    const p=PROGRAMS[Number(el.dataset.id)]; if(p) openModal(p);
+  });
+  /* 모달 클릭 — 모드별 처리 */
+  modal.addEventListener('click',e=>{
+    if(modalMode==='program'){
+      if(e.target.closest('#mPickBtn')){ commitModalPicks(); return; }   // 담기 확정
+      const ch=e.target.closest('.chip');
+      if(ch && ch.dataset.name){ if(ch.dataset.locked) return; ch.classList.toggle('picked'); updateModalCount(); }  // 선택 토글(저장X)
+    } else if(modalMode==='pick'){
+      const ch=e.target.closest('.chip');
+      if(ch && ch.dataset.name){ if(ch.dataset.locked) return; togglePick(ch.dataset.name); openPickModal(); }   // 담은 과목 빼기 + 재렌더
+    } else if(modalMode==='gye'){
+      const b=e.target.closest('.gye-chip');
+      if(b){ closeModal(); goApp('gye', b.dataset.sel); }   // 해당 계열 가이드로 이동
+    } else if(modalMode==='avatar'){
+      const b=e.target.closest('.ava-opt');
+      if(b){ setAva(b.dataset.src); closeModal(); }   // 프로필 사진 선택
+    } else if(modalMode==='sem'){
+      const ch=e.target.closest('.chip');
+      if(ch && ch.dataset.name){ if(ch.dataset.locked) return; togglePick(ch.dataset.name); openSemModal(modalSem); }   // 그 학기 과목 빼기
+    }
+  });
+  modalBack.addEventListener('click',e=>{
+    if(e.target===modalBack || e.target.closest('#mclose')) closeModal();
+  });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !modalBack.hidden) closeModal(); });
+
+  /* ---- 홈 ↔ 가이드 화면 전환 ---- */
+  const home = document.getElementById('home');
+  const app  = document.getElementById('app');
+  function showApp(){ home.hidden=true; app.hidden=false; window.scrollTo(0,0); }
+  function showHome(){ app.hidden=true; home.hidden=false; window.scrollTo(0,0); }
+  function goApp(mode, sel){
+    state.mode = mode;
+    state.sel  = sel || (mode==='gye' ? GYE[0] : UNIS[0]);
+    document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('on', x.dataset.mode===mode));
+    render();
+    showApp();
+  }
+  /* 홈의 계열/학교 바로가기 칩 생성 */
+  document.getElementById('homeGye').innerHTML =
+    GYE.map(g=>`<button class="hchip" data-go="gye" data-sel="${g}">${g}</button>`).join('');
+  document.getElementById('homeUni').innerHTML =
+    UNIS.map(u=>`<button class="hchip" data-go="uni" data-sel="${u}" style="--bc:${brandOf(u)}"><span class="dot"></span>${u.replace('학교','')}</button>`).join('');
+  /* 홈 클릭(이벤트 위임): data-go(모드) / data-sel(선택) */
+  home.addEventListener('click', e=>{
+    const el = e.target.closest('[data-go]'); if(!el) return;
+    goApp(el.dataset.go, el.dataset.sel || '');
+  });
+  document.getElementById('goHome').addEventListener('click', showHome);
+
+  /* 가이드북 바로가기 (학년별 전자책) */
+  const GUIDEBOOK={ '1':'https://ebook.dsummer.co.kr/books/fzfh/#p=1', '2':'https://ebook.dsummer.co.kr/books/nycq/#p=1' };
+  document.getElementById('guidebookRow').addEventListener('click', ()=>{
+    const url = GUIDEBOOK[getGrade()] || GUIDEBOOK['2'];
+    window.open(url, '_blank', 'noopener');
+  });
+
+  /* 홈 통계 카드 → 팝업 */
+  document.querySelectorAll('#home .stat.to-my').forEach(el=>el.addEventListener('click',()=>{
+    if(el.dataset.pop==='gye') openGyeModal(); else openPickModal();
+  }));
+  /* 학기 마일스톤 클릭 → 학기별 담은 과목 팝업 */
+  document.querySelector('#home .ticks').addEventListener('click',e=>{
+    const t=e.target.closest('.tick'); if(!t || !t.dataset.sem) return;
+    openSemModal(t.dataset.sem);
+  });
+
+  /* ---- 마이페이지 ---- */
+  const my = document.getElementById('my');
+  function showMy(){ home.hidden=true; app.hidden=true; my.hidden=false; document.getElementById('myNick').textContent=getNick(); applyAva(); updateGradeUI(); updatePickedUI(); window.scrollTo(0,0); }
+  function hideMy(){ my.hidden=true; home.hidden=false; window.scrollTo(0,0); }
+  document.getElementById('goSettings').addEventListener('click', showMy);
+  document.getElementById('myBack').addEventListener('click', hideMy);
+  document.getElementById('myEdit').addEventListener('click', ()=>{
+    const v=prompt('닉네임을 입력하세요', getNick());
+    if(v!==null){ const t=v.trim(); if(t) setNick(t); }
+  });
+  document.getElementById('myAvaBtn').addEventListener('click', openAvatarModal);
+
+  /* ---- 학년(1/2학년) 선택 — 랜딩 ---- */
+  const GRADE_KEY='sokcho_grade_v1';
+  const landing=document.getElementById('landing');
+  function getGrade(){ try{ return localStorage.getItem(GRADE_KEY); }catch(e){ return null; } }
+  function rosterFor(g){ return g==='1' ? (window.STUDENTS1||{}) : (window.STUDENTS||{}); }
+  function gradeLabel(){ const g=getGrade(); if(!g) return '학년 미설정';
+    const id=getStu(); const st=id?rosterFor(g)[id]:null;
+    return st ? g+'학년 · '+st.name+'('+id+')' : g+'학년'; }
+  function updateGradeUI(){ const el=document.getElementById('myGradeLabel'); if(el) el.textContent=gradeLabel();
+    const gb=document.getElementById('gbSub'); if(gb){ const g=getGrade();
+      gb.textContent = g ? g+'학년 선택과목 가이드북(전자책)' : '학년별 선택과목 가이드북(전자책)'; } }
+  function setGrade(g){ try{ localStorage.setItem(GRADE_KEY, g); }catch(e){} updateGradeUI(); }
+  function fitLanding(){ const h=window.innerHeight+'px'; landing.style.height=h;
+    const lp=landing.firstElementChild; if(lp) lp.style.height=h; }
+  window.addEventListener('resize', fitLanding);
+  window.addEventListener('orientationchange', ()=>setTimeout(fitLanding,120));
+  let lpGrade='2';
+  function lpShowGrades(){ const a=document.getElementById('lpGrades'),b=document.getElementById('lpLogin'),n=document.getElementById('lpNote');
+    if(a)a.hidden=false; if(b)b.hidden=true; if(n)n.hidden=true; }
+  function lpShowLogin(){ const a=document.getElementById('lpGrades'),b=document.getElementById('lpLogin'),er=document.getElementById('lpErr'),n=document.getElementById('lpNote'),
+      t=document.getElementById('lpLoginT'),hk=document.getElementById('lpHak'),nm=document.getElementById('lpName');
+    if(t) t.textContent=(lpGrade==='1'?'1학년':'2학년')+' 로그인';
+    if(hk){ hk.placeholder='학번 5자리 (예: '+(lpGrade==='1'?'10101':'20101')+')'; hk.value=''; }
+    if(nm) nm.value='';
+    if(a)a.hidden=true; if(b)b.hidden=false; if(er)er.hidden=true; if(n)n.hidden=true; }
+  function showLanding(){ landing.hidden=false; home.hidden=true; app.hidden=true; my.hidden=true;
+    lpShowGrades(); fitLanding(); window.scrollTo(0,0); }
+  function leaveLanding(){ landing.hidden=true; showHome(); }
+  landing.addEventListener('click', e=>{
+    if(e.target.closest('#lpBack')){ lpShowGrades(); return; }
+    if(e.target.closest('#lpSkip')){ setGrade(lpGrade); setStu(''); updatePickedUI(); leaveLanding(); return; }   // 로그인 없이 둘러보기
+    if(e.target.closest('#lpLoginBtn')){
+      const hak=(document.getElementById('lpHak').value||'').trim();
+      const name=(document.getElementById('lpName').value||'').trim();
+      const er=document.getElementById('lpErr');
+      if(!/^\d{5}$/.test(hak) || !name){ er.textContent='학번 5자리와 이름을 정확히 입력해 주세요.'; er.hidden=false; return; }
+      const rec=rosterFor(lpGrade)[hak];
+      if(!rec || rec.name!==name){ er.textContent='학번 또는 이름이 일치하지 않아요. 다시 확인해 주세요.'; er.hidden=false; return; }
+      setStu(hak); setGrade(lpGrade); setNick(rec.name); seedLockedPicks(); updatePickedUI(); leaveLanding();
+      return;
+    }
+    const b=e.target.closest('.lp-grade'); if(!b) return;
+    lpGrade=b.dataset.grade; lpShowLogin();
+  });
+  document.getElementById('myGrade').addEventListener('click', showLanding);
+  /* 마이페이지에서 담은 과목 칩 탭 → 빼기 */
+  my.addEventListener('click', e=>{
+    const ch=e.target.closest('.chip'); if(!ch || !ch.dataset.name) return;
+    if(ch.dataset.locked) return;   /* 확정 과목은 빼기 불가 */
+    togglePick(ch.dataset.name);  /* 제거 후 updatePickedUI가 목록 재렌더 */
+  });
+
+  setNick(getNick());
+  applyAva();
+  updateGradeUI();
+  seedLockedPicks();   // 로그인 유지 중인 2학년 학생의 확정 과목 반영
+  render();
+  updatePickedUI();
+  if(!getGrade()) showLanding();   // 첫 접속(학년 미설정) → 학년 선택 랜딩
+})();
+</script>
+
+<!-- ===== 박람회 앱 연동: 돌아가기 버튼 (한 번 로그인 → 세션 공유) ===== -->
+<style>
+  #fairBack{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:60;
+    display:inline-flex;align-items:center;gap:6px;padding:11px 16px;border-radius:9999px;
+    background:#2f4a1c;color:#fff;font-size:13.5px;font-weight:700;text-decoration:none;border:0;
+    box-shadow:0 8px 20px rgba(47,74,28,.32);font-family:inherit;cursor:pointer;}
+  #fairBack:active{transform:scale(.97);}
+</style>
+<a id="fairBack" href="../index.html" aria-label="박람회 홈으로">‹ 박람회 홈</a>
+
+</body>
+</html>

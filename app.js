@@ -148,13 +148,17 @@
   // 외부 링크로 바로 연결되는 메뉴
   var LINKS = {
     metaverse: "https://zep.us/play/mkRW1q",
-    recommend: "https://scieum.github.io/Course_registration/",
     ebook:     "https://example.com/ebook"   // TODO: 실제 E-Book 링크로 교체
+  };
+  // 앱에 내장된 페이지(같은 탭 이동, 로그인 세션 공유)
+  var PAGES = {
+    recommend: "recommend/index.html"   // 선택과목 추천 (Course_registration 통합)
   };
 
   document.querySelectorAll(".m-card[data-go]").forEach(function (card) {
     card.addEventListener("click", function () {
       var key = card.dataset.go;
+      if (PAGES[key]) { window.location.href = PAGES[key]; return; }   // 세션 그대로 이어짐
       if (LINKS[key]) { window.open(LINKS[key], "_blank", "noopener"); return; }
       openDetail(key);
     });
