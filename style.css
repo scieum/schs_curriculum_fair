@@ -149,6 +149,9 @@ button{font-family:inherit;}
 #home .m-card .m-ic img{width:36px;height:36px;object-fit:contain;}
 #home .m-card .m-tt{font-size:15.5px;font-weight:700;color:#2b2310;margin-top:14px;letter-spacing:-.3px;}
 #home .m-card .m-sub{font-size:12.5px;color:#9a895f;margin-top:3px;}
+/* 맨 위 강조 카드 */
+#home .m-card.m-top{background:linear-gradient(160deg,#eef7e9,#ffffff 70%);border-color:#d8eccf;}
+#home .m-card.m-top .m-ic{background:#dcefd2;}
 
 #home .foot{font-size:11px;color:var(--silver);text-align:center;margin-top:22px;line-height:1.6;}
 
@@ -212,3 +215,18 @@ button{font-family:inherit;}
   box-shadow:0 8px 18px rgba(233,87,63,.28);transition:transform .08s ease,opacity .15s ease;}
 #detail .mp-logout:active{transform:scale(.98);}
 #detail .mp-logout:hover{opacity:.94;}
+
+/* ── 1차 수요조사 결과 ── */
+#detail .sv-wrap{display:flex;flex-direction:column;gap:14px;margin-top:4px;}
+#detail .sv-sem{background:#fff;border:1px solid #f1ece0;border-radius:16px;overflow:hidden;
+  box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .sv-sem-h{display:flex;align-items:center;justify-content:space-between;
+  padding:13px 16px;background:#f6f3ea;}
+#detail .sv-badge{font-size:14px;font-weight:800;color:#2f4a1c;}
+#detail .sv-cnt{font-size:12px;font-weight:700;color:#8a7c55;}
+#detail .sv-list{list-style:none;margin:0;padding:6px 16px 12px;}
+#detail .sv-item{padding:10px 0;border-top:1px solid #f4efe4;font-size:14.5px;font-weight:700;
+  color:#1f7a3d;letter-spacing:-.2px;}
+#detail .sv-item:first-child{border-top:0;}
+#detail .sv-empty{padding:14px 0;color:#a3a3a3;font-size:13.5px;font-weight:600;}
+#detail .sv-none{margin-top:18px;text-align:center;color:#9a895f;font-size:14px;font-weight:600;}

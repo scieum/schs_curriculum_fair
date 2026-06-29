@@ -140,6 +140,7 @@
   /* ---------- 5) 메뉴 라우팅 ---------- */
   var MENU = {
     timetable:  "나의 시간표 확인",
+    survey:     "1차 수요조사 결과",
     metaverse:  "메타버스 박람회 접속",
     curriculum: "우리학교 편제표 확인",
     schedule:   "전체 일정 확인"
@@ -147,6 +148,7 @@
   // 외부 링크로 바로 연결되는 메뉴
   var LINKS = {
     metaverse: "https://zep.us/play/mkRW1q",
+    recommend: "https://scieum.github.io/Course_registration/",
     ebook:     "https://example.com/ebook"   // TODO: 실제 E-Book 링크로 교체
   };
 
@@ -159,7 +161,8 @@
   });
   function openDetail(key) {
     $("detailTitle").textContent = MENU[key] || "안내";
-    if (key === "timetable") renderTimetable();
+    if (key === "timetable")   renderTimetable();
+    else if (key === "survey") renderSurvey();
     else renderSoon();
     show("detail");
   }
@@ -229,6 +232,57 @@
       +   '<div class="d-soon">준비 중인 기능이에요</div>'
       +   '<div class="d-desc">다음 단계에서 이어서 만들 예정이에요.</div>'
       + '</div>';
+  }
+
+  /* ---------- 1차 수요조사 결과 (학기별 신청 과목) ----------
+     데이터: window.SURVEY1[학번] = { s1:[과목..], s2:[과목..] }  (1학기/2학기)
+       아직 데이터 미연동 시 안내 화면을 보여준다. */
+  function semBlock(title, list) {
+    var items = (list && list.length)
+      ? list.map(function (s) { return '<li class="sv-item">' + esc(s) + '</li>'; }).join("")
+      : '<li class="sv-empty">신청 내역이 없어요</li>';
+    return '<div class="sv-sem">'
+      + '<div class="sv-sem-h"><span class="sv-badge">' + title + '</span>'
+      +   '<span class="sv-cnt">' + ((list && list.length) || 0) + '과목</span></div>'
+      + '<ul class="sv-list">' + items + '</ul>'
+      + '</div>';
+  }
+
+  function renderSurvey() {
+    var hak   = localStorage.getItem(KEY.hak) || "";
+    var grade = localStorage.getItem(KEY.grade) || "";
+    var name  = localStorage.getItem(KEY.name) || "속초고 학생";
+    var data  = (grade === "1") ? window.SURVEY1 : window.SURVEY;
+    var rec   = (data && data[hak]) ? data[hak] : null;
+
+    // 데이터 자체가 아직 연동되지 않은 경우
+    if (!data) {
+      $("detailBody").innerHTML = ''
+        + '<div class="soon">'
+        +   '<img class="d-char" src="img/character2.png" alt="" onerror="this.style.display=\'none\'">'
+        +   '<div class="d-soon">곧 제공될 예정이에요</div>'
+        +   '<div class="d-desc">1차 수요조사 신청 결과를 학기별로 보여드릴게요.</div>'
+        + '</div>';
+      return;
+    }
+
+    var html = ''
+      + '<div class="tt-head">'
+      +   '<img src="' + pickChar(name) + '" alt="" onerror="this.style.display=\'none\'">'
+      +   '<div><div class="tt-who">' + esc(name) + (name !== "게스트" ? "님" : "") + '</div>'
+      +   '<div class="tt-meta">' + (hak ? "학번 " + esc(hak) + " · " : "") + '1차 수요조사 신청 결과</div></div>'
+      + '</div>'
+      + '<p class="tt-note">내가 <b>1차 수요조사</b>에서 신청한 과목을 <b>학기별</b>로 정리했어요.</p>';
+
+    if (!rec) {
+      html += '<div class="sv-none">신청 내역을 찾을 수 없어요. 학번을 확인해 주세요.</div>';
+    } else {
+      html += '<div class="sv-wrap">'
+        + semBlock("1학기", rec.s1)
+        + semBlock("2학기", rec.s2)
+        + '</div>';
+    }
+    $("detailBody").innerHTML = html;
   }
 
   function esc(s) {
