@@ -14,7 +14,7 @@
   var EVENT_DATE = "2026-07-10";
 
   // 교사용 페이지 접속 코드 (필요하면 이 값만 바꾸면 됩니다)
-  var TEACHER_CODE = "2026";
+  var TEACHER_CODE = "0710";
 
   // 현재 사용자가 교사 모드인지
   function isTeacher() { return (localStorage.getItem(KEY.grade) || "") === "T"; }
@@ -74,14 +74,31 @@
     clearErr();
   });
 
-  /* ---------- 교사용 로그인 (1·2학년 통합 보기) ---------- */
+  /* ---------- 교사용 로그인 (이름 검색 + 코드, 1·2학년 통합 보기) ---------- */
   function tErr(m) { var e = $("lpTErr"); e.textContent = m; e.hidden = false; }
+  // 교사 명단에서 이름으로 조회(공백 무시)
+  function findTeacher(name) {
+    var list = window.TEACHERS || [];
+    var key = normName(name);
+    for (var i = 0; i < list.length; i++) { if (normName(list[i].name) === key) return list[i]; }
+    return null;
+  }
+  // 이름 자동완성 목록 채우기
+  (function fillTeacherDatalist() {
+    var dl = $("teacherNames"); if (!dl) return;
+    (window.TEACHERS || []).forEach(function (t) {
+      var o = document.createElement("option");
+      o.value = t.name + (t.subject ? " (" + t.subject + ")" : "");
+      dl.appendChild(o);
+    });
+  })();
   $("lpTeacherBtn").addEventListener("click", function () {
     $("lpGrades").hidden = true;
     $("lpTeacher").hidden = false;
     $("lpTErr").hidden = true;
+    $("lpTName").value = "";
     $("lpCode").value = "";
-    $("lpCode").focus();
+    $("lpTName").focus();
   });
   $("lpTBack").addEventListener("click", function () {
     $("lpTeacher").hidden = true;
@@ -89,13 +106,19 @@
     $("lpTErr").hidden = true;
   });
   $("lpTBtn").addEventListener("click", function () {
+    // datalist 선택값에 붙는 " (과목)" 꼬리표 제거 후 이름만 추출
+    var raw = $("lpTName").value.trim().replace(/\s*\(.*\)\s*$/, "");
+    var t = findTeacher(raw);
+    if (!t) { tErr("교사 명단에서 이름을 찾을 수 없어요."); return; }
     if ($("lpCode").value.trim() !== TEACHER_CODE) { tErr("교사용 코드가 올바르지 않아요."); return; }
     localStorage.setItem(KEY.grade, "T");
     localStorage.setItem(KEY.hak, "");
-    localStorage.setItem(KEY.name, "선생님");
-    enterHome("선생님");
+    localStorage.setItem(KEY.name, t.name);
+    enterHome(t.name);
   });
-  $("lpCode").addEventListener("keydown", function (e) { if (e.key === "Enter") $("lpTBtn").click(); });
+  ["lpTName", "lpCode"].forEach(function (id) {
+    $(id).addEventListener("keydown", function (e) { if (e.key === "Enter") $("lpTBtn").click(); });
+  });
 
   function clearErr() { var e = $("lpErr"); e.hidden = true; e.textContent = ""; }
   function showErr(m) { var e = $("lpErr"); e.textContent = m; e.hidden = false; }
@@ -617,6 +640,7 @@
     $("lpGrades").hidden = false;
     $("lpHak").value = "";
     $("lpName").value = "";
+    $("lpTName").value = "";
     $("lpCode").value = "";
     clearErr();
     show("landing");
@@ -629,11 +653,19 @@
     var ds    = datasetFor(grade);
     var rec   = (ds && ds[hak]) ? ds[hak] : null;
 
-    var rows = ""
-      + '<div class="mp-row"><span class="mp-k">이름</span><span class="mp-v">' + esc(name) + '</span></div>'
-      + (grade ? '<div class="mp-row"><span class="mp-k">학년</span><span class="mp-v">' + esc(grade) + '학년</span></div>' : "")
-      + (rec   ? '<div class="mp-row"><span class="mp-k">학반</span><span class="mp-v">' + esc(rec.cls) + ' · ' + rec.no + '번</span></div>' : "")
-      + (hak   ? '<div class="mp-row"><span class="mp-k">학번</span><span class="mp-v">' + esc(hak) + '</span></div>' : "");
+    var rows;
+    if (grade === "T") {                       // 교사
+      var t = findTeacher(name) || {};
+      rows = '<div class="mp-row"><span class="mp-k">이름</span><span class="mp-v">' + esc(name) + '</span></div>'
+        + '<div class="mp-row"><span class="mp-k">구분</span><span class="mp-v">교사</span></div>'
+        + (t.subject  ? '<div class="mp-row"><span class="mp-k">담당</span><span class="mp-v">' + esc(t.subject) + '</span></div>' : "")
+        + (t.homeroom ? '<div class="mp-row"><span class="mp-k">담임</span><span class="mp-v">' + esc(t.homeroom) + '호실</span></div>' : "");
+    } else {
+      rows = '<div class="mp-row"><span class="mp-k">이름</span><span class="mp-v">' + esc(name) + '</span></div>'
+        + (grade ? '<div class="mp-row"><span class="mp-k">학년</span><span class="mp-v">' + esc(grade) + '학년</span></div>' : "")
+        + (rec   ? '<div class="mp-row"><span class="mp-k">학반</span><span class="mp-v">' + esc(rec.cls) + ' · ' + rec.no + '번</span></div>' : "")
+        + (hak   ? '<div class="mp-row"><span class="mp-k">학번</span><span class="mp-v">' + esc(hak) + '</span></div>' : "");
+    }
 
     $("detailBody").innerHTML = ''
       + '<div class="mp">'

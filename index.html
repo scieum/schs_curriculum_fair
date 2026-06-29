@@ -29,7 +29,9 @@
         </div>
         <div class="lp-login" id="lpTeacher" hidden>
           <div class="lp-login-t">교사용 로그인</div>
-          <input class="lp-input" id="lpCode" type="password" inputmode="numeric" placeholder="교사용 코드" />
+          <input class="lp-input" id="lpTName" type="text" list="teacherNames" placeholder="교사 이름 검색" autocomplete="off" />
+          <datalist id="teacherNames"></datalist>
+          <input class="lp-input" id="lpCode" type="password" inputmode="numeric" maxlength="8" placeholder="교사용 코드" />
           <div class="lp-login-err" id="lpTErr" hidden></div>
           <button class="lp-login-btn" id="lpTBtn">확인</button>
           <button class="lp-back" id="lpTBack">‹ 학년 다시 선택</button>
@@ -140,6 +142,7 @@
 <script src="data_survey2.js"></script>
 <script src="data_survey_agg.js"></script>
 <script src="data_subject_meta.js"></script>
+<script src="data_teachers.js"></script>
 <script src="data_curriculum.js"></script>
 <script src="app.js"></script>
 </body>
