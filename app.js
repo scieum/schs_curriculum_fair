@@ -495,7 +495,8 @@
     sc.style.transform = "none"; fit.style.height = "";
     var avail = fit.clientWidth || 1;
     var nat   = tbl.offsetWidth || 1;
-    var s = Math.min(1, avail / nat);
+    // 화면 폭에 맞춤: 좁으면 축소, 넓으면(PC) 확대해 폭을 가득 채움
+    var s = avail / nat;
     sc.style.transform = "scale(" + s + ")";
     fit.style.height = Math.ceil(tbl.offsetHeight * s) + "px";
   }
