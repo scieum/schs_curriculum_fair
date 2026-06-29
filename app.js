@@ -324,33 +324,69 @@
   }
 
   /* ---------- 우리학교 편제표 (3개년 교육과정) ----------
-     data_curriculum.js → window.CURRICULUM["1"|"2"] = 편제표 <table> HTML. */
+     data_curriculum.js → window.CURRICULUM["1"|"2"] = 편제표 <table> HTML.
+     '한눈에 보기' = 표 전체를 화면 폭에 맞게 자동 축소(scale), '원본 크기' = 가로 스크롤. */
+  var pjFitBound = false;
+  function fitCurriculum() {
+    var body = $("pjBody"); if (!body) return;
+    var fit = body.querySelector(".pj-fit");
+    var sc  = body.querySelector(".pj-scale");
+    if (!fit || !sc) return;
+    var tbl = sc.querySelector("table"); if (!tbl) return;
+    sc.style.transform = "none"; fit.style.height = "";
+    var avail = fit.clientWidth || 1;
+    var nat   = tbl.offsetWidth || 1;
+    var s = Math.min(1, avail / nat);
+    sc.style.transform = "scale(" + s + ")";
+    fit.style.height = Math.ceil(tbl.offsetHeight * s) + "px";
+  }
+
   function renderCurriculum() {
     var data = window.CURRICULUM || null;
     if (!data) { renderSoon(); return; }
 
     var grade = localStorage.getItem(KEY.grade) || "1";
     if (grade !== "1" && grade !== "2") grade = "1";
+    var mode = "fit";   // fit = 한눈에(자동 축소), scroll = 원본 크기
 
-    function paint(g) {
-      $("pjBody").innerHTML = '<div class="pj-wrap">' + (data[g] || "") + '</div>';
-      document.querySelectorAll("#pjTabs .sch-tab").forEach(function (b) {
-        b.classList.toggle("on", b.dataset.g === g);
-      });
+    function paint() {
+      document.querySelectorAll("#pjModes .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.m === mode); });
+      document.querySelectorAll("#pjTabs .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.g === grade); });
+      var html = data[grade] || "";
+      if (mode === "fit") {
+        $("pjBody").innerHTML = '<div class="pj-fit"><div class="pj-scale">' + html + '</div></div>';
+        requestAnimationFrame(fitCurriculum);
+      } else {
+        $("pjBody").innerHTML = '<div class="pj-wrap">' + html + '</div>';
+      }
     }
 
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note">학년별 <b>3개년 교육과정 편제표</b>예요. (1학년=2026학년도 입학생 · 2학년=2025학년도 입학생) 표는 좌우로 넘겨 볼 수 있어요.</p>'
+      + '<p class="tt-note">학년별 <b>3개년 교육과정 편제표</b>예요. (1학년=2026학년도 입학생 · 2학년=2025학년도 입학생) <b>한눈에 보기</b>는 화면에 맞춰 줄여 보여줘요.</p>'
+      + '<div class="sch-modes" id="pjModes">'
+      +   '<button class="sch-tab" data-m="fit">한눈에 보기</button>'
+      +   '<button class="sch-tab" data-m="scroll">원본 크기</button>'
+      + '</div>'
       + '<div class="sch-tabs" id="pjTabs">'
       +   '<button class="sch-tab" data-g="1">1학년</button>'
       +   '<button class="sch-tab" data-g="2">2학년</button>'
       + '</div>'
       + '<div id="pjBody"></div>';
 
-    document.querySelectorAll("#pjTabs .sch-tab").forEach(function (b) {
-      b.addEventListener("click", function () { paint(b.dataset.g); });
+    document.querySelectorAll("#pjModes .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { mode = b.dataset.m; paint(); });
     });
-    paint(grade);
+    document.querySelectorAll("#pjTabs .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
+    });
+
+    if (!pjFitBound) {
+      pjFitBound = true;
+      window.addEventListener("resize", function () {
+        if (document.querySelector("#pjBody .pj-fit")) fitCurriculum();
+      });
+    }
+    paint();
   }
 
   function renderSoon() {
