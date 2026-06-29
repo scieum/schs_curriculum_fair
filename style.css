@@ -241,6 +241,7 @@ button{font-family:inherit;}
 .pj-area{background:#faf7ef;font-weight:700;color:#6b5526;}
 .pj-tagc{background:#fff;}
 .pj-subj{text-align:left;font-weight:700;color:#2b2310;}
+.pj-must{white-space:normal;word-break:keep-all;max-width:30px;padding-left:3px;padding-right:3px;font-size:10px;}
 .pj-num{color:#6b5526;}
 .pj-sem{font-weight:800;color:#1f7a3d;}
 .pj-note{white-space:normal;max-width:150px;font-size:10px;color:#8a7c55;text-align:left;line-height:1.35;}
@@ -257,7 +258,7 @@ button{font-family:inherit;}
 .pj-fit{overflow:hidden;width:100%;}
 .pj-scale{display:inline-block;transform-origin:top left;will-change:transform;}
 .pj-fit .pj-table{font-size:11px;}
-.pj-fit .pj-subj{white-space:normal;max-width:108px;}
+.pj-fit .pj-subj{white-space:normal;min-width:120px;max-width:170px;}
 .pj-fit .pj-note{white-space:normal;max-width:96px;}
 
 /* ── MY PAGE ── */
