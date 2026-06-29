@@ -24,6 +24,11 @@
     var g = localStorage.getItem(KEY.grade) || "";
     return (g === "1" || g === "2") ? [g] : ["1", "2"];
   }
+  // 이름 뒤 호칭: 교사="선생님", 학생="학생" (게스트는 없음)
+  function honorific(name) {
+    if (!name || name === "게스트") return "";
+    return isTeacher() ? " 선생님" : " 학생";
+  }
 
   // 캐릭터(수달) 풀
   var CHARS = ["img/character1.png","img/character2.png","img/character3.png","img/character4.png","img/character5.png"];
@@ -205,7 +210,7 @@
   }
 
   function enterHome(name) {
-    var nm = (name && name !== "게스트") ? name + "님" : "속초고 학생";
+    var nm = (name && name !== "게스트") ? name + honorific(name) : "속초고 학생";
     $("homeWho").textContent = nm;
     $("homeChar").src = pickChar(name);
     setDday();
@@ -348,7 +353,7 @@
     var html = ""
       + '<div class="tt-head">'
       +   '<img src="' + pickChar(name) + '" alt="" onerror="this.style.display=\'none\'">'
-      +   '<div><div class="tt-who">' + esc(name) + (name !== "게스트" ? "님" : "") + '</div>'
+      +   '<div><div class="tt-who">' + esc(name) + honorific(name) + '</div>'
       +   '<div class="tt-meta">'
       +     (hak ? "학번 " + esc(hak) + (clsLabel ? " · " + clsLabel : "") : "6타임 이동 시간표")
       +   '</div></div>'
@@ -617,7 +622,7 @@
     var html = ''
       + '<div class="tt-head">'
       +   '<img src="' + pickChar(name) + '" alt="" onerror="this.style.display=\'none\'">'
-      +   '<div><div class="tt-who">' + esc(name) + (name !== "게스트" ? "님" : "") + '</div>'
+      +   '<div><div class="tt-who">' + esc(name) + honorific(name) + '</div>'
       +   '<div class="tt-meta">' + (hak ? "학번 " + esc(hak) + " · " : "") + '1차 수요조사 신청 결과</div></div>'
       + '</div>'
       + '<p class="tt-note">내가 <b>1차 수요조사</b>에서 신청한 과목이에요. 과목 옆에 <b>교과</b>와 <b>일반·진로·융합</b> 구분을 함께 표시했어요.</p>';
@@ -693,7 +698,7 @@
     var t = findTeacher(name) || {};
     var head = '<div class="tt-head">'
       + '<img src="' + pickChar(name) + '" alt="" onerror="this.style.display=\'none\'">'
-      + '<div><div class="tt-who">' + esc(name) + '님</div>'
+      + '<div><div class="tt-who">' + esc(name) + honorific(name) + '</div>'
       + '<div class="tt-meta">' + (t.subject ? esc(t.subject) + ' · ' : '') + '임장(감독) 일정</div></div>'
       + '</div>';
 
@@ -765,10 +770,49 @@
       return '<tr><th class="mc-stu"><span class="mc-no">' + s.no + '</span><span class="mc-nm">' + esc(s.name) + '</span></th>' + tds + '</tr>';
     }).join("");
 
+    var tableHtml = '<div class="mc-wrap"><table class="mc-table"><thead><tr><th class="mc-corner">번호·이름</th>'
+      + thTimes + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note"><b>' + esc(cls) + '반</b> 학생들이 타임별로 이동하는 <b>부스·교실</b>이에요. (총 ' + studs.length + '명)</p>'
-      + '<div class="mc-wrap"><table class="mc-table"><thead><tr><th class="mc-corner">번호·이름</th>' + thTimes + '</tr></thead><tbody>'
-      + body + '</tbody></table></div>';
+      + '<div class="mc-head">'
+      +   '<p class="tt-note mc-note"><b>' + esc(cls) + '반</b> 학생들이 타임별로 이동하는 <b>부스·교실</b>이에요. (총 ' + studs.length + '명)</p>'
+      +   '<button class="mc-print" id="mcPrint">🖨️ 인쇄</button>'
+      + '</div>'
+      + tableHtml;
+
+    $("mcPrint").addEventListener("click", function () {
+      openPrintWindow(esc(cls) + "반 학생 타임별 위치 (총 " + studs.length + "명)", tableHtml);
+    });
+  }
+
+  /* ---------- 인쇄용 새 창 (가로 방향) ---------- */
+  function openPrintWindow(title, innerHtml) {
+    var w = window.open("", "_blank");
+    if (!w) { alert("팝업이 차단되어 인쇄 창을 열 수 없어요. 브라우저의 팝업 허용 후 다시 시도해 주세요."); return; }
+    var css = ''
+      + '@page{size:A4 landscape;margin:9mm;}'
+      + '*{box-sizing:border-box;}'
+      + 'body{font-family:"Pretendard","Malgun Gothic",sans-serif;margin:0;padding:14px;color:#1c1c1c;}'
+      + 'h2{font-size:15px;margin:0 0 10px;}'
+      + '.mc-wrap{overflow:visible;border:0;box-shadow:none;}'
+      + 'table{border-collapse:collapse;width:100%;table-layout:fixed;}'
+      + 'th,td{border:1px solid #444;padding:3px 4px;text-align:center;vertical-align:middle;'
+      +   'font-size:9.5px;width:14.2857%;word-break:keep-all;overflow:hidden;}'
+      + 'thead th{background:#2f4a1c !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+      + 'thead th .mc-when{display:block;font-size:7.5px;font-weight:400;margin-top:1px;}'
+      + 'tbody th{background:#f0ede3 !important;text-align:left;padding-left:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+      + 'tbody th .mc-no{color:#999;margin-right:4px;}'
+      + 'tbody th .mc-nm{font-weight:700;}'
+      + '.mc-room{display:block;font-weight:700;color:#1f7a3d;font-size:9.5px;}'
+      + '.mc-subj{display:block;font-size:7.5px;color:#666;margin-top:1px;line-height:1.2;}'
+      + '.mc-empty{color:#bbb;}'
+      + 'tbody tr:nth-child(even) td{background:#f7f7f3;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
+    w.document.write('<!doctype html><html lang="ko"><head><meta charset="utf-8">'
+      + '<title>' + title + '</title><style>' + css + '</style></head><body>'
+      + '<h2>' + title + '</h2>' + innerHtml
+      + '<scr' + 'ipt>window.onload=function(){setTimeout(function(){window.print();},250);};</scr' + 'ipt>'
+      + '</body></html>');
+    w.document.close();
   }
 
   function esc(s) {
@@ -822,7 +866,7 @@
     $("detailBody").innerHTML = ''
       + '<div class="mp">'
       +   '<img class="mp-char" src="' + pickChar(name) + '" alt="" onerror="this.style.display=\'none\'">'
-      +   '<div class="mp-name">' + esc(name) + (name !== "게스트" ? "님" : "") + '</div>'
+      +   '<div class="mp-name">' + esc(name) + honorific(name) + '</div>'
       +   '<div class="mp-card">' + rows + '</div>'
       +   '<button class="mp-logout" id="logoutBtn">로그아웃</button>'
       + '</div>';
