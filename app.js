@@ -167,6 +167,7 @@
     $("detailTitle").textContent = MENU[key] || "안내";
     if (key === "timetable")   renderTimetable();
     else if (key === "survey") renderSurvey();
+    else if (key === "schedule") renderSchedule();
     else renderSoon();
     show("detail");
   }
@@ -213,7 +214,7 @@
       +   '<th class="c-time">타임</th><th class="c-when">시간</th><th>수강 과목 · 이동 교실</th>'
       + '</tr></thead><tbody>';
 
-    var ROOMS = window.ROOMS_G1 || {};
+    var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
     for (var i = 0; i < 6; i++) {
       var subj = subjects[i] || "-";
       var room = (ROOMS[subj] || {})[SLOT_LETTERS[i]] || "";
@@ -227,6 +228,62 @@
     }
     html += '</tbody></table>';
     $("detailBody").innerHTML = html;
+  }
+
+  /* ---------- 전체 일정 (1·2학년 타임별 전체 부스·교실) ----------
+     ROOMS_G1 / ROOMS_G2[과목][타임] = 교실. 타임별로 모든 부스를 모아 표시. */
+  function buildScheduleTable(grade) {
+    var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
+    var rows = "";
+    for (var i = 0; i < 6; i++) {
+      var L = SLOT_LETTERS[i];
+      var items = [];
+      for (var subj in ROOMS) {
+        var rm = ROOMS[subj][L];
+        if (rm) items.push({ subj: subj, room: rm });
+      }
+      items.sort(function (a, b) { return a.room.localeCompare(b.room, "ko", { numeric: true }); });
+      var list = items.length
+        ? '<ul class="sch-list">' + items.map(function (it) {
+            return '<li><span class="t-subj">' + esc(it.subj) + '</span>'
+              + '<span class="t-room">📍 ' + esc(it.room) + '</span></li>';
+          }).join("") + '</ul>'
+        : '<span class="sch-empty">운영 부스 없음</span>';
+      rows += '<tr>'
+        + '<td class="c-time"><span class="t-no">' + L + '</span></td>'
+        + '<td class="c-when"><span class="t-when">' + (TIME_SLOTS[i] || "") + '</span></td>'
+        + '<td>' + list + '</td>'
+        + '</tr>';
+    }
+    return '<table class="tt-table sch-table"><thead><tr>'
+      + '<th class="c-time">타임</th><th class="c-when">시간</th><th>운영 부스 (과목 · 교실)</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  function renderSchedule() {
+    var grade = localStorage.getItem(KEY.grade) || "1";
+    if (grade !== "1" && grade !== "2") grade = "1";
+
+    function paint(g) {
+      $("schBody").innerHTML = buildScheduleTable(g);
+      document.querySelectorAll("#schTabs .sch-tab").forEach(function (b) {
+        b.classList.toggle("on", b.dataset.g === g);
+      });
+    }
+
+    $("detailBody").innerHTML = ''
+      + '<p class="tt-note">A~F 타임별로 운영되는 <b>전체 부스</b>와 <b>교실 위치</b>예요. 학년 탭을 눌러 확인하세요.</p>'
+      + '<div class="sch-tabs" id="schTabs">'
+      +   '<button class="sch-tab" data-g="1">1학년</button>'
+      +   '<button class="sch-tab" data-g="2">2학년</button>'
+      + '</div>'
+      + '<div id="schBody"></div>'
+      + '<a class="sch-grid-link" href="schedule_all.html">📋 반별 표로 한 페이지에 보기 (1·2학년 · 인쇄용)</a>';
+
+    document.querySelectorAll("#schTabs .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { paint(b.dataset.g); });
+    });
+    paint(grade);
   }
 
   function renderSoon() {
