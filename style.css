@@ -163,8 +163,51 @@ button{font-family:inherit;}
 #detail .d-back:active{background:rgba(0,0,0,.05);border-radius:10px;}
 #detail .d-ttl{flex:1;text-align:center;font-weight:700;font-size:17px;color:#2b2310;}
 #detail .d-sp{width:40px;flex:0 0 auto;}
-#detail .d-body{text-align:center;padding:60px 24px;}
-#detail .d-char{width:150px;height:auto;filter:drop-shadow(0 12px 16px rgba(80,120,170,.22));
+#detail .d-body{padding:18px 16px 48px;}
+
+/* 준비중 플레이스홀더 */
+#detail .soon{text-align:center;padding:50px 24px;}
+#detail .soon .d-char{width:150px;height:auto;filter:drop-shadow(0 12px 16px rgba(80,120,170,.22));
   animation:bob 3s ease-in-out infinite;}
-#detail .d-soon{font-size:19px;font-weight:800;color:#2b2310;margin-top:24px;}
-#detail .d-desc{font-size:14px;color:var(--mute);margin-top:8px;}
+#detail .soon .d-soon{font-size:19px;font-weight:800;color:#2b2310;margin-top:24px;}
+#detail .soon .d-desc{font-size:14px;color:var(--mute);margin-top:8px;}
+
+/* ── 나의 시간표 ── */
+.tt-head{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#e7f4cf,#d6eebb);
+  border-radius:18px;padding:16px 18px;margin-bottom:16px;}
+.tt-head img{width:52px;height:52px;object-fit:contain;flex:0 0 auto;}
+.tt-head .tt-who{font-size:18px;font-weight:800;color:#2f4a1c;letter-spacing:-.3px;}
+.tt-head .tt-meta{font-size:13px;font-weight:600;color:#5e7a3a;margin-top:2px;}
+
+.tt-note{font-size:12px;color:var(--mute);margin:0 2px 12px;line-height:1.5;}
+
+.tt-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #ece7da;
+  border-radius:16px;overflow:hidden;box-shadow:0 6px 18px rgba(120,90,30,.05);}
+.tt-table th{background:#f6f3ea;color:#6b5526;font-size:12px;font-weight:700;padding:11px 8px;text-align:center;}
+.tt-table td{padding:13px 8px;text-align:center;border-top:1px solid #f1ece0;vertical-align:middle;}
+.tt-table td:last-child{text-align:left;}
+.tt-table .c-time{width:64px;}
+.tt-table .c-when{width:96px;}
+.tt-table .t-no{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+  border-radius:50%;background:#2f4a1c;color:#fff;font-size:13px;font-weight:800;}
+.tt-table .t-when{font-size:12.5px;color:#8a7c55;font-weight:600;}
+.tt-table .t-room{font-size:17px;font-weight:800;color:#1f7a3d;letter-spacing:-.2px;}
+.tt-table .t-subj{display:block;font-size:14.5px;font-weight:800;color:#1f7a3d;letter-spacing:-.2px;line-height:1.35;}
+.tt-table tr:nth-child(even) td{background:#fcfbf7;}
+
+/* ── MY PAGE ── */
+#detail .mp{text-align:center;padding:32px 22px 40px;}
+#detail .mp-char{width:120px;height:auto;filter:drop-shadow(0 12px 16px rgba(80,120,170,.22));}
+#detail .mp-name{font-size:20px;font-weight:800;color:#2b2310;margin-top:16px;}
+#detail .mp-card{margin:22px auto 0;max-width:340px;background:#fff;border:1px solid #f1ece0;
+  border-radius:16px;padding:6px 18px;box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .mp-row{display:flex;justify-content:space-between;align-items:center;
+  padding:13px 0;border-top:1px solid #f4efe4;}
+#detail .mp-row:first-child{border-top:0;}
+#detail .mp-k{font-size:13px;color:#9a895f;font-weight:600;}
+#detail .mp-v{font-size:15px;color:#2b2310;font-weight:800;}
+#detail .mp-logout{margin-top:26px;width:100%;max-width:340px;padding:15px;border:0;
+  border-radius:14px;background:#e9573f;color:#fff;font-size:16px;font-weight:800;cursor:pointer;
+  box-shadow:0 8px 18px rgba(233,87,63,.28);transition:transform .08s ease,opacity .15s ease;}
+#detail .mp-logout:active{transform:scale(.98);}
+#detail .mp-logout:hover{opacity:.94;}
