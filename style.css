@@ -198,7 +198,7 @@ button{font-family:inherit;}
 .tt-table .t-no{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
   border-radius:50%;background:#2f4a1c;color:#fff;font-size:13px;font-weight:800;}
 .tt-table .t-when{font-size:12px;color:#8a7c55;font-weight:600;}
-.tt-table .t-subj{font-size:13.5px;font-weight:800;color:#2b2310;letter-spacing:-.3px;}
+.tt-table .t-subj{font-size:13.5px;font-weight:600;color:#2b2310;letter-spacing:-.3px;}
 .tt-table .t-room{display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:2px 9px 2px 7px;
   border-radius:999px;vertical-align:middle;
   background:#eaf5e6;color:#1f7a3d;font-size:12px;font-weight:800;letter-spacing:-.2px;}
