@@ -308,10 +308,12 @@ button{font-family:inherit;}
 #detail .sv-none{margin-top:18px;text-align:center;color:#9a895f;font-size:14px;font-weight:600;}
 
 /* ── 교과별 신청 인원(집계) ── */
-#detail .ag-link{display:block;width:100%;margin:16px 0 4px;padding:14px;border:0;border-radius:14px;
+#detail .ag-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  margin:16px 0 4px;padding:14px;border:0;border-radius:14px;
   background:#2f4a1c;color:#fff;font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer;
   box-shadow:0 8px 18px rgba(47,74,28,.18);}
 #detail .ag-link:active{transform:scale(.99);}
+#detail .ag-link-ic{width:22px;height:22px;object-fit:contain;flex:none;}
 #detail .ag-back{border:0;background:transparent;color:#6e8a48;font-size:13.5px;font-weight:700;
   font-family:inherit;cursor:pointer;padding:2px 0 10px;}
 #detail .ag-wrap{display:flex;flex-direction:column;gap:14px;margin-top:4px;}

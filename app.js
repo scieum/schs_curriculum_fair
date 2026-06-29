@@ -483,7 +483,7 @@
     function dataFor(g) { return (g === "1") ? window.SURVEY1 : window.SURVEY; }
 
     // 교과별 신청 인원(별도 페이지) 바로가기 버튼
-    var aggBtn = '<button class="ag-link" id="goAgg">📊 교과별 신청 인원 보기 ›</button>';
+    var aggBtn = '<button class="ag-link" id="goAgg"><img class="ag-link-ic" src="img/graph.png" alt="" aria-hidden="true">교과별 신청 인원 보기 ›</button>';
 
     // 교사: 개인 신청 데이터가 없으므로 안내 + 집계 페이지 버튼만
     if (teacher) {
