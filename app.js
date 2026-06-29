@@ -168,6 +168,7 @@
     if (key === "timetable")   renderTimetable();
     else if (key === "survey") renderSurvey();
     else if (key === "schedule") renderSchedule();
+    else if (key === "curriculum") renderCurriculum();
     else renderSoon();
     show("detail");
   }
@@ -320,6 +321,36 @@
       b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
     });
     paint();
+  }
+
+  /* ---------- 우리학교 편제표 (3개년 교육과정) ----------
+     data_curriculum.js → window.CURRICULUM["1"|"2"] = 편제표 <table> HTML. */
+  function renderCurriculum() {
+    var data = window.CURRICULUM || null;
+    if (!data) { renderSoon(); return; }
+
+    var grade = localStorage.getItem(KEY.grade) || "1";
+    if (grade !== "1" && grade !== "2") grade = "1";
+
+    function paint(g) {
+      $("pjBody").innerHTML = '<div class="pj-wrap">' + (data[g] || "") + '</div>';
+      document.querySelectorAll("#pjTabs .sch-tab").forEach(function (b) {
+        b.classList.toggle("on", b.dataset.g === g);
+      });
+    }
+
+    $("detailBody").innerHTML = ''
+      + '<p class="tt-note">학년별 <b>3개년 교육과정 편제표</b>예요. (1학년=2026학년도 입학생 · 2학년=2025학년도 입학생) 표는 좌우로 넘겨 볼 수 있어요.</p>'
+      + '<div class="sch-tabs" id="pjTabs">'
+      +   '<button class="sch-tab" data-g="1">1학년</button>'
+      +   '<button class="sch-tab" data-g="2">2학년</button>'
+      + '</div>'
+      + '<div id="pjBody"></div>';
+
+    document.querySelectorAll("#pjTabs .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { paint(b.dataset.g); });
+    });
+    paint(grade);
   }
 
   function renderSoon() {

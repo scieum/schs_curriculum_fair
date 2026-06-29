@@ -231,6 +231,28 @@ button{font-family:inherit;}
 .mx-table tbody tr:nth-child(even) td{background:#fcfbf7;}
 .mx-table tbody tr:nth-child(even) td.empty{background:#f7f4ec;}
 
+/* ── 우리학교 편제표 ── */
+.pj-wrap{overflow-x:auto;border:1px solid #ece7da;border-radius:14px;background:#fff;
+  box-shadow:0 6px 18px rgba(120,90,30,.05);-webkit-overflow-scrolling:touch;}
+.pj-table{border-collapse:collapse;font-size:11px;white-space:nowrap;}
+.pj-table th,.pj-table td{border:1px solid #e8e1d0;padding:5px 7px;text-align:center;vertical-align:middle;}
+.pj-table thead th{background:#2f4a1c;color:#fff;font-weight:700;position:sticky;top:0;z-index:2;}
+.pj-sec{background:#f0ebdc;font-weight:800;color:#5a4a1e;}
+.pj-area{background:#faf7ef;font-weight:700;color:#6b5526;}
+.pj-tagc{background:#fff;}
+.pj-subj{text-align:left;font-weight:700;color:#2b2310;}
+.pj-num{color:#6b5526;}
+.pj-sem{font-weight:800;color:#1f7a3d;}
+.pj-note{white-space:normal;max-width:150px;font-size:10px;color:#8a7c55;text-align:left;line-height:1.35;}
+.pj-credit{background:#fbfdf9;font-weight:800;color:#2f4a1c;}
+.pj-table .e{color:#d8cdb0;}
+.pj-total td{background:#eef3e8 !important;font-weight:800;color:#2f4a1c;}
+.pj-tag{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:800;}
+.t-gong{background:#e7eef9;color:#2c5aa0;}
+.t-ilban{background:#eaf5e6;color:#1f7a3d;}
+.t-jinro{background:#fdeede;color:#b5701a;}
+.t-yung{background:#f3e9f7;color:#8244a3;}
+
 /* ── MY PAGE ── */
 #detail .mp{text-align:center;padding:32px 22px 40px;}
 #detail .mp-char{width:120px;height:auto;filter:drop-shadow(0 12px 16px rgba(80,120,170,.22));}
