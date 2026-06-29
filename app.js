@@ -260,30 +260,66 @@
       + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
+  // 반별 표(행렬): 열=교실, 행=A~F 타임, 칸=과목
+  function buildMatrix(grade) {
+    var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
+    var roomset = {};
+    for (var s in ROOMS) for (var t in ROOMS[s]) roomset[ROOMS[s][t]] = 1;
+    var rooms = Object.keys(roomset).sort(function (a, b) { return a.localeCompare(b, "ko", { numeric: true }); });
+    var cell = {};
+    SLOT_LETTERS.forEach(function (L) { cell[L] = {}; });
+    for (var s2 in ROOMS) for (var t2 in ROOMS[s2]) cell[t2][ROOMS[s2][t2]] = s2;
+
+    var head = '<tr><th class="mx-corner">타임</th>'
+      + rooms.map(function (r) { return '<th>' + esc(r) + '</th>'; }).join("") + '</tr>';
+    var body = "";
+    for (var i = 0; i < 6; i++) {
+      var L = SLOT_LETTERS[i];
+      body += '<tr><th>' + L + '<span class="mx-when">' + (TIME_SLOTS[i] || "") + '</span></th>'
+        + rooms.map(function (r) {
+            var v = cell[L][r];
+            return v ? '<td>' + esc(v) + '</td>' : '<td class="empty">·</td>';
+          }).join("") + '</tr>';
+    }
+    return '<div class="mx-wrap"><table class="mx-table"><thead>' + head
+      + '</thead><tbody>' + body + '</tbody></table></div>';
+  }
+
   function renderSchedule() {
     var grade = localStorage.getItem(KEY.grade) || "1";
     if (grade !== "1" && grade !== "2") grade = "1";
+    var mode = "list";   // list = 타임별 목록, grid = 반별 표
 
-    function paint(g) {
-      $("schBody").innerHTML = buildScheduleTable(g);
-      document.querySelectorAll("#schTabs .sch-tab").forEach(function (b) {
-        b.classList.toggle("on", b.dataset.g === g);
+    function paint() {
+      document.querySelectorAll("#schModes .sch-tab").forEach(function (b) {
+        b.classList.toggle("on", b.dataset.m === mode);
       });
+      document.querySelectorAll("#schTabs .sch-tab").forEach(function (b) {
+        b.classList.toggle("on", b.dataset.g === grade);
+      });
+      $("schBody").innerHTML = (mode === "grid") ? buildMatrix(grade) : buildScheduleTable(grade);
     }
 
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note">A~F 타임별로 운영되는 <b>전체 부스</b>와 <b>교실 위치</b>예요. 학년 탭을 눌러 확인하세요.</p>'
+      + '<p class="tt-note">A~F 타임별 <b>전체 부스</b>와 <b>교실 위치</b>예요. 보기 방식과 학년을 골라 확인하세요.</p>'
+      + '<div class="sch-modes" id="schModes">'
+      +   '<button class="sch-tab" data-m="list">타임별 목록</button>'
+      +   '<button class="sch-tab" data-m="grid">반별 표</button>'
+      + '</div>'
       + '<div class="sch-tabs" id="schTabs">'
       +   '<button class="sch-tab" data-g="1">1학년</button>'
       +   '<button class="sch-tab" data-g="2">2학년</button>'
       + '</div>'
       + '<div id="schBody"></div>'
-      + '<a class="sch-grid-link" href="schedule_all.html">📋 반별 표로 한 페이지에 보기 (1·2학년 · 인쇄용)</a>';
+      + '<a class="sch-grid-link" href="schedule_all.html">🖨️ 1·2학년 한 페이지로(인쇄용) 열기</a>';
 
-    document.querySelectorAll("#schTabs .sch-tab").forEach(function (b) {
-      b.addEventListener("click", function () { paint(b.dataset.g); });
+    document.querySelectorAll("#schModes .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { mode = b.dataset.m; paint(); });
     });
-    paint(grade);
+    document.querySelectorAll("#schTabs .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
+    });
+    paint();
   }
 
   function renderSoon() {
