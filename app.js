@@ -260,7 +260,7 @@
         +  '<td class="c-time"><span class="t-no">' + SLOT_LETTERS[i] + '</span></td>'
         +  '<td class="c-when"><span class="t-when">' + (TIME_SLOTS[i] || "") + '</span></td>'
         +  '<td><span class="t-subj">' + esc(subj) + '</span>'
-        +     (room ? '<span class="t-room">📍 ' + esc(room) + '</span>' : "")
+        +     (room ? '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(room) + '</span>' : "")
         +  '</td>'
         + '</tr>';
     }
@@ -284,7 +284,7 @@
       var list = items.length
         ? '<ul class="sch-list">' + items.map(function (it) {
             return '<li><span class="t-subj">' + esc(it.subj) + '</span>'
-              + '<span class="t-room">📍 ' + esc(it.room) + '</span></li>';
+              + '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(it.room) + '</span></li>';
           }).join("") + '</ul>'
         : '<span class="sch-empty">운영 부스 없음</span>';
       rows += '<tr>'
