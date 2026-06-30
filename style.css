@@ -217,6 +217,11 @@ button{font-family:inherit;}
 .sch-list .t-room{margin-left:0;flex:none;white-space:nowrap;}
 .sch-empty{font-size:12px;color:var(--mute);}
 .sch-modes{display:flex;gap:8px;margin:0 2px 10px;}
+
+/* 교과별 카테고리 칩 (줄바꿈, 알약형, 넉넉한 여백) */
+.subj-cats{display:flex;flex-wrap:wrap;gap:9px;margin:2px 2px 16px;}
+.subj-cats .sch-tab{flex:0 0 auto;padding:10px 17px;font-size:13.5px;font-weight:700;
+  border-radius:999px;line-height:1;}
 .sch-grid-link{display:block;margin:16px 2px 0;padding:13px 14px;text-align:center;
   background:#eaf5e6;border:1px solid #cfe6c4;border-radius:12px;
   color:#1f7a3d;font-size:13.5px;font-weight:800;text-decoration:none;}

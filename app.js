@@ -241,6 +241,7 @@
       menu += menuCard("duty", "calander.png", "임장 일정", "내 감독 시간·장소");
       if (t.homeroom) menu += menuCard("myclass", "compass.png", "우리반 학생 위치", "타임별 이동 현황");
       menu += menuCard("schedule", "pin.png", "전체 일정 확인", "박람회 타임테이블");
+      menu += menuCard("subjects", "graph.png", "교과별 부스 배치", "교과·타임별 운영 과목");
       menu += menuCard("surveyagg", "excel.png", "교과별 신청 인원", "수요조사 집계");
       menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
       menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
@@ -267,6 +268,7 @@
     metaverse:  "메타버스 박람회 접속",
     curriculum: "우리학교 편제표 확인",
     schedule:   "전체 일정 확인",
+    subjects:   "교과별 부스 배치",
     duty:       "임장 일정",
     myclass:    "우리반 학생 위치"
   };
@@ -302,6 +304,7 @@
     else if (key === "survey") renderSurvey();
     else if (key === "surveyagg") renderSurveyAgg();
     else if (key === "schedule") renderSchedule();
+    else if (key === "subjects") renderSubjects();
     else if (key === "curriculum") renderCurriculum();
     else if (key === "duty") renderDuty();
     else if (key === "myclass") renderMyClass();
@@ -489,6 +492,112 @@
     });
     document.querySelectorAll("#schTabs .sch-tab").forEach(function (b) {
       b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
+    });
+    paint();
+  }
+
+  /* ---------- 교과별 부스 배치 ----------
+     국/수/영/사/과/보건/정보/일본어/러시아어 9개 교과로 분류해
+     교과 선택 시 각 타임(A~F)에 운영되는 과목·교실을 보여준다.
+     분류 규칙(우선순위):
+       1) '탐구 프로젝트(R&E)' → 과학 (※ 사용자 지정)
+       2) 보건 → 보건,  일본 → 일본어,  러시아 → 러시아어
+       3) 그 외에는 SUBJECT_META의 dept로 매핑 (제2외국어/교양/예술/체육은 위에서 처리·제외) */
+  var SUBJ_CATS = ["국어", "수학", "영어", "사회", "과학", "보건", "정보", "일본어", "러시아어"];
+  var DEPT2CAT = { "국어": "국어", "수학": "수학", "영어": "영어", "사회": "사회", "과학": "과학", "정보": "정보" };
+
+  // 학년별 SUBJECT_META를 공백 무시 키로 색인(캐시) — "미적분 Ⅱ" vs "미적분Ⅱ" 차이 흡수
+  var _normMeta = {};
+  function normMetaFor(g) {
+    if (_normMeta[g]) return _normMeta[g];
+    var mg = (window.SUBJECT_META || {})[g] || {}, out = {};
+    for (var k in mg) out[normName(k)] = mg[k];
+    return (_normMeta[g] = out);
+  }
+
+  function catOf(key, grade) {
+    if (/탐구\s*프로젝트|R&E/i.test(key)) return "과학";
+    if (key.indexOf("보건") !== -1) return "보건";
+    if (key.indexOf("일본") !== -1) return "일본어";
+    if (key.indexOf("러시아") !== -1) return "러시아어";
+    var parts = key.split(/\s*[&·]\s*/);              // 결합 과목명 분리
+    var gs = grade ? [grade, (grade === "1" ? "2" : "1")] : ["1", "2"];
+    for (var gi = 0; gi < gs.length; gi++) {
+      var nm = normMetaFor(gs[gi]);
+      for (var pi = 0; pi < parts.length; pi++) {
+        var m = nm[normName(parts[pi])];
+        if (m && DEPT2CAT[m.dept]) return DEPT2CAT[m.dept];
+      }
+    }
+    return null;
+  }
+
+  function subjGroups(grade) {
+    var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
+    var map = {};
+    for (var key in ROOMS) {
+      var c = catOf(key, grade);
+      if (!c) continue;
+      (map[c] = map[c] || []).push(key);
+    }
+    return { ROOMS: ROOMS, map: map };
+  }
+
+  function buildSubjectTable(grade, cat) {
+    var g = subjGroups(grade), ROOMS = g.ROOMS, keys = g.map[cat] || [];
+    var rows = "";
+    for (var i = 0; i < 6; i++) {
+      var L = SLOT_LETTERS[i], items = [];
+      keys.forEach(function (k) { var rm = ROOMS[k][L]; if (rm) items.push({ subj: k, room: rm }); });
+      items.sort(function (a, b) { return a.room.localeCompare(b.room, "ko", { numeric: true }); });
+      var list = items.length
+        ? '<ul class="sch-list">' + items.map(function (it) {
+            return '<li><span class="t-subj">' + esc(it.subj) + '</span>'
+              + '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(it.room) + '</span></li>';
+          }).join("") + '</ul>'
+        : '<span class="sch-empty">이 타임에 운영 없음</span>';
+      rows += '<tr>'
+        + '<td class="c-time"><span class="t-no">' + L + '</span></td>'
+        + '<td class="c-when"><span class="t-when">' + (TIME_SLOTS[i] || "") + '</span></td>'
+        + '<td>' + list + '</td></tr>';
+    }
+    return '<table class="tt-table sch-table"><thead><tr>'
+      + '<th class="c-time">타임</th><th class="c-when">시간</th><th>운영 과목 · 교실</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  function renderSubjects() {
+    var grades = viewGrades();
+    var grade = grades[0];
+    var cat = null;
+
+    function availCats(g) { var m = subjGroups(g).map; return SUBJ_CATS.filter(function (c) { return m[c]; }); }
+
+    function paint() {
+      var cats = availCats(grade);
+      if (cats.indexOf(cat) === -1) cat = cats[0];
+      document.querySelectorAll("#sjTabs .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.g === grade); });
+      $("sjCats").innerHTML = cats.map(function (c) {
+        return '<button class="sch-tab' + (c === cat ? " on" : "") + '" data-c="' + c + '">' + c + '</button>';
+      }).join("");
+      $("sjBody").innerHTML = buildSubjectTable(grade, cat);
+    }
+
+    var note = isTeacher()
+      ? '교과를 선택하면 <b>각 타임(A~F)에 운영되는 과목</b>과 <b>교실</b>을 보여줘요. 학년도 고를 수 있어요.'
+      : '<b>' + grade + '학년</b> 교과를 선택하면 <b>각 타임(A~F)에 운영되는 과목</b>과 <b>교실</b>을 보여줘요.';
+
+    $("detailBody").innerHTML = ''
+      + '<p class="tt-note">' + note + '</p>'
+      + gradeTabsHtml("sjTabs", grades, grade)
+      + '<div class="subj-cats" id="sjCats"></div>'
+      + '<div id="sjBody"></div>';
+
+    document.querySelectorAll("#sjTabs .sch-tab").forEach(function (b) {
+      b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
+    });
+    $("sjCats").addEventListener("click", function (e) {
+      var b = e.target.closest(".sch-tab"); if (!b) return; cat = b.dataset.c; paint();
     });
     paint();
   }
