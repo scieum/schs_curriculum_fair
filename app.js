@@ -234,11 +234,11 @@
     var hS = hero.querySelector(".hc-sub");
     var menu = "";
     if (teacher) {
-      hero.dataset.go = "schedule";
-      hT.textContent = "전체 일정 확인";
-      hS.textContent = "A~F 타임별 부스·교실 한눈에";
+      hero.dataset.go = "duty";
+      hT.textContent = "내 임장 일정";
+      hS.textContent = "내 감독 시간·장소 확인";
       var t = findTeacher(name) || {};
-      menu += menuCard("duty", "calander.png", "임장 일정", "내 감독 시간·장소");
+      menu += menuCard("duty", "calander.png", "내 임장 일정", "내 감독 시간·장소");
       if (t.homeroom) menu += menuCard("myclass", "compass.png", "우리반 학생 위치", "타임별 이동 현황");
       menu += menuCard("schedule", "pin.png", "전체 일정 확인", "박람회 타임테이블");
       menu += menuCard("subjects", "graph.png", "교과별 부스 배치", "교과·타임별 운영 과목");
