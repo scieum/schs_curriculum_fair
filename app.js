@@ -577,10 +577,14 @@
       var L = SLOT_LETTERS[i], items = [];
       keys.forEach(function (k) { var rm = ROOMS[k][L]; if (rm) items.push({ subj: k, room: rm }); });
       items.sort(function (a, b) { return a.room.localeCompare(b.room, "ko", { numeric: true }); });
+      var slotL = L;
       var list = items.length
         ? '<ul class="sch-list">' + items.map(function (it) {
-            return '<li><span class="t-subj">' + esc(it.subj) + '</span>'
-              + '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(it.room) + '</span></li>';
+            return '<li><button class="ro-cell" data-slot="' + slotL + '" data-subj="' + esc(it.subj) + '">'
+              + '<span class="t-subj">' + esc(it.subj) + '</span>'
+              + '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(it.room) + '</span>'
+              + '<span class="ro-go">출석부 ›</span>'
+              + '</button></li>';
           }).join("") + '</ul>'
         : '<span class="sch-empty">이 타임에 운영 없음</span>';
       rows += '<tr>'
@@ -593,11 +597,11 @@
       + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
-  function renderSubjects() {
+  function renderSubjects(init) {
     var grades = viewGrades();
-    var grade = grades[0];
-    var cat = null;
-    var sub = "전체";
+    var grade = (init && init.grade) || grades[0];
+    var cat = (init && init.cat) || null;
+    var sub = (init && init.sub) || "전체";
 
     function availCats(g) { var m = subjGroups(g).map; return SUBJ_CATS.filter(function (c) { return m[c]; }); }
     // 현재 교과의 세부 분류 칩 목록(데이터 있는 것만). 세부 분류 없는 교과면 null
@@ -648,6 +652,14 @@
     });
     $("sjCats").addEventListener("click", function (e) {
       var b = e.target.closest(".sch-tab"); if (!b) return; cat = b.dataset.c; sub = "전체"; paint();
+    });
+    // 과목 클릭 → 그 부스의 학생 출석부 (돌아가면 현재 교과/세부/학년 유지)
+    $("sjBody").addEventListener("click", function (e) {
+      var c = e.target.closest(".ro-cell"); if (!c) return;
+      var keepGrade = grade, keepCat = cat, keepSub = sub;
+      openRoster(grade, c.dataset.slot, c.dataset.subj, function () {
+        renderSubjects({ grade: keepGrade, cat: keepCat, sub: keepSub });
+      });
     });
     $("sjSubs").addEventListener("click", function (e) {
       var b = e.target.closest(".sch-tab"); if (!b) return; sub = b.dataset.s; paint();
@@ -982,14 +994,105 @@
       return '<tr>'
         + '<td class="c-time"><span class="t-no">' + esc(d.time || "") + '</span></td>'
         + '<td class="c-when"><span class="t-when">' + (TIME_SLOTS[i] || "") + '</span></td>'
-        + '<td><span class="t-subj">' + esc(d.booth || "") + '</span>'
+        + '<td><button class="ro-cell" data-slot="' + esc(d.time || "") + '" data-booth="' + esc(d.booth || "") + '">'
+        +   '<span class="t-subj">' + esc(d.booth || "") + '</span>'
         +   (d.room ? '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(d.room) + '</span>' : "")
-        + '</td></tr>';
+        +   '<span class="ro-go">출석부 ›</span>'
+        + '</button></td></tr>';
     }).join("");
     $("detailBody").innerHTML = head
-      + '<p class="tt-note">선생님이 <b>감독(임장)</b>할 타임과 부스·교실이에요.</p>'
+      + '<p class="tt-note">선생님이 <b>감독(임장)</b>할 타임과 부스·교실이에요. 과목을 누르면 <b>학생 출석부</b>를 볼 수 있어요.</p>'
       + '<table class="tt-table"><thead><tr><th class="c-time">타임</th><th class="c-when">시간</th><th>감독 부스 · 교실</th></tr></thead><tbody>'
       + rows + '</tbody></table>';
+    var dutyTbl = $("detailBody").querySelector(".tt-table");
+    if (dutyTbl) dutyTbl.addEventListener("click", function (e) {
+      var c = e.target.closest(".ro-cell"); if (!c) return;
+      var booth = c.dataset.booth, slot = c.dataset.slot;
+      openRoster(gradeOfBooth(booth, slot), slot, booth, renderDuty);
+    });
+  }
+
+  /* ---------- 부스 출석부 (과목 클릭 → 하위 페이지) ----------
+     (학년·타임·과목) 으로 그 부스를 듣는 학생을 모아 학년/반/번호/이름 순 정렬.
+     인쇄 버튼으로 출석부를 바로 출력. */
+  function banOf(cls) { var p = String(cls || "").split("-"); return parseInt(p[1], 10) || 0; }
+  function gradeOfBooth(booth, slot) {
+    var g1 = (window.ROOMS_G1 || {})[booth], g2 = (window.ROOMS_G2 || {})[booth];
+    if (g1 && (!slot || g1[slot])) return "1";
+    if (g2 && (!slot || g2[slot])) return "2";
+    if (g1) return "1"; if (g2) return "2"; return "1";
+  }
+  function roomOf(grade, slot, subject) {
+    var R = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
+    return (R[subject] || {})[slot] || "";
+  }
+  function rosterStudents(grade, slot, subject) {
+    var ds = datasetFor(grade) || {}, idx = SLOT_ORDER[slot], list = [];
+    for (var hak in ds) {
+      var r = ds[hak];
+      if (r && (r.slots || [])[idx] === subject)
+        list.push({ grade: grade, ban: banOf(r.cls), no: r.no, name: r.name });
+    }
+    list.sort(function (a, b) {
+      if (a.ban !== b.ban) return a.ban - b.ban;
+      if (a.no !== b.no) return a.no - b.no;
+      return String(a.name).localeCompare(String(b.name), "ko");
+    });
+    return list;
+  }
+
+  function openRoster(grade, slot, subject, backFn) {
+    var idx = SLOT_ORDER[slot], when = TIME_SLOTS[idx] || "", room = roomOf(grade, slot, subject);
+    var studs = rosterStudents(grade, slot, subject);
+    $("detailTitle").textContent = "출석부";
+    var body = studs.length
+      ? studs.map(function (s) {
+          return '<tr><td>' + s.grade + '</td><td>' + s.ban + '</td><td>' + s.no
+            + '</td><td class="ro-nm">' + esc(s.name) + '</td><td class="ro-chk"></td></tr>';
+        }).join("")
+      : '<tr><td colspan="5" class="ro-empty">이 타임에 이 과목을 듣는 학생이 없어요.</td></tr>';
+    $("detailBody").innerHTML = ''
+      + '<div class="ro-top">'
+      +   '<button class="ro-back" id="roBack">‹ 돌아가기</button>'
+      +   '<button class="ro-print" id="roPrint"><img class="btn-ic" src="img/print.png" alt="" aria-hidden="true">출석부 인쇄</button>'
+      + '</div>'
+      + '<div class="ro-info"><div class="ro-subj">' + esc(subject) + '</div>'
+      +   '<div class="ro-meta">' + grade + '학년 · ' + esc(slot) + '타임 ' + esc(when)
+      +     (room ? ' · ' + esc(room) : "") + ' · 총 <b>' + studs.length + '</b>명</div></div>'
+      + '<table class="tt-table ro-table"><thead><tr>'
+      +   '<th>학년</th><th>반</th><th>번호</th><th>이름</th><th>확인</th>'
+      + '</tr></thead><tbody>' + body + '</tbody></table>';
+    $("roBack").addEventListener("click", function () { if (backFn) backFn(); });
+    $("roPrint").addEventListener("click", function () { printRoster(grade, slot, subject, studs, when, room); });
+    show("detail");
+  }
+
+  function printRoster(grade, slot, subject, studs, when, room) {
+    var rows = studs.length
+      ? studs.map(function (s) {
+          return '<tr><td>' + s.grade + '</td><td>' + s.ban + '</td><td>' + s.no
+            + '</td><td class="nm">' + esc(s.name) + '</td><td></td></tr>';
+        }).join("")
+      : '<tr><td colspan="5">학생 없음</td></tr>';
+    var html = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>출석부 - ' + esc(subject) + '</title>'
+      + '<style>'
+      + '*{font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;box-sizing:border-box;}'
+      + 'body{margin:22px;color:#111;}h1{font-size:18px;margin:0 0 4px;}'
+      + '.sub{font-size:13px;color:#444;margin:0 0 14px;}'
+      + 'table{width:100%;border-collapse:collapse;}'
+      + 'th,td{border:1px solid #777;padding:7px 8px;font-size:13px;text-align:center;}'
+      + 'th{background:#eee;}td.nm{text-align:left;}td:last-child{width:96px;}'
+      + '</style></head><body>'
+      + '<h1>2026 속초고 교육과정 박람회 · 출석부</h1>'
+      + '<p class="sub">' + esc(subject) + '  |  ' + grade + '학년 ' + esc(slot) + '타임 ' + esc(when)
+      +   (room ? '  |  ' + esc(room) : "") + '  |  총 ' + studs.length + '명</p>'
+      + '<table><thead><tr><th>학년</th><th>반</th><th>번호</th><th>이름</th><th>확인</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody></table>'
+      + '<scr' + 'ipt>window.onload=function(){window.print();}</scr' + 'ipt>'
+      + '</body></html>';
+    var w = window.open("", "_blank");
+    if (!w) { alert("팝업이 차단되었어요. 팝업 허용 후 다시 시도해 주세요."); return; }
+    w.document.open(); w.document.write(html); w.document.close();
   }
 
   /* ---------- (담임) 우리반 학생 타임별 위치 ----------
