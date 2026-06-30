@@ -222,6 +222,11 @@ button{font-family:inherit;}
 .subj-cats{display:flex;flex-wrap:wrap;gap:9px;margin:2px 2px 16px;}
 .subj-cats .sch-tab{flex:0 0 auto;padding:10px 17px;font-size:13.5px;font-weight:700;
   border-radius:999px;line-height:1;}
+
+/* 2단계 세부 분류 칩 (사회/과학) — 한 단계 작고 연하게 */
+.subj-subs{gap:7px;margin:-6px 2px 16px;padding-left:6px;}
+.subj-subs .sch-tab{padding:7px 13px;font-size:12.5px;background:#f3f6ee;border-color:#e0e8d2;color:#5e7a3a;}
+.subj-subs .sch-tab.on{background:#6f9e3a;border-color:#6f9e3a;color:#fff;}
 .sch-grid-link{display:block;margin:16px 2px 0;padding:13px 14px;text-align:center;
   background:#eaf5e6;border:1px solid #cfe6c4;border-radius:12px;
   color:#1f7a3d;font-size:13.5px;font-weight:800;text-decoration:none;}

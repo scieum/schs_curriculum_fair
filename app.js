@@ -532,6 +532,32 @@
     return null;
   }
 
+  // 2단계 세부 분류 (사회/과학만). '전체'는 항상 첫 칩.
+  var SOC_SUBS = ["전체", "일반사회", "윤리", "지리", "역사", "기타"];
+  var SCI_SUBS = ["전체", "물리학", "화학", "생명과학", "지구과학", "기타"];
+
+  function socSub(key) {
+    if (/윤리|사상/.test(key)) return "윤리";
+    if (/역사|한국사|세계사|동아시아/.test(key)) return "역사";
+    if (/지리|도시|기후|국토|세계시민/.test(key)) return "지리";
+    if (/사회와 문화|정치|법|경제|금융|국제|사회문제|문화/.test(key)) return "일반사회";
+    return "기타";
+  }
+  function sciSub(key) {
+    if (/탐구\s*프로젝트|R&E|융합과학/i.test(key)) return "기타";
+    if (/물리|역학|전자기|양자/.test(key)) return "물리학";
+    if (/생명|생물|유전|세포/.test(key)) return "생명과학";   // '물질대사'의 물질 오인 방지: 화학보다 먼저
+    if (/화학|물질/.test(key)) return "화학";
+    if (/지구|우주|행성|천체/.test(key)) return "지구과학";
+    return "기타";
+  }
+  // 교과(cat) 안에서의 세부 분류명 (세부 분류가 없는 교과는 null)
+  function subOf(cat, key) {
+    if (cat === "사회") return socSub(key);
+    if (cat === "과학") return sciSub(key);
+    return null;
+  }
+
   function subjGroups(grade) {
     var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
     var map = {};
@@ -543,8 +569,9 @@
     return { ROOMS: ROOMS, map: map };
   }
 
-  function buildSubjectTable(grade, cat) {
+  function buildSubjectTable(grade, cat, sub) {
     var g = subjGroups(grade), ROOMS = g.ROOMS, keys = g.map[cat] || [];
+    if (sub && sub !== "전체") keys = keys.filter(function (k) { return subOf(cat, k) === sub; });
     var rows = "";
     for (var i = 0; i < 6; i++) {
       var L = SLOT_LETTERS[i], items = [];
@@ -570,17 +597,39 @@
     var grades = viewGrades();
     var grade = grades[0];
     var cat = null;
+    var sub = "전체";
 
     function availCats(g) { var m = subjGroups(g).map; return SUBJ_CATS.filter(function (c) { return m[c]; }); }
+    // 현재 교과의 세부 분류 칩 목록(데이터 있는 것만). 세부 분류 없는 교과면 null
+    function subListFor(g, c) {
+      var defs = (c === "사회") ? SOC_SUBS : (c === "과학") ? SCI_SUBS : null;
+      if (!defs) return null;
+      var keys = subjGroups(g).map[c] || [], present = {};
+      keys.forEach(function (k) { present[subOf(c, k)] = 1; });
+      return defs.filter(function (s) { return s === "전체" || present[s]; });
+    }
 
     function paint() {
       var cats = availCats(grade);
-      if (cats.indexOf(cat) === -1) cat = cats[0];
+      if (cats.indexOf(cat) === -1) { cat = cats[0]; sub = "전체"; }
       document.querySelectorAll("#sjTabs .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.g === grade); });
       $("sjCats").innerHTML = cats.map(function (c) {
         return '<button class="sch-tab' + (c === cat ? " on" : "") + '" data-c="' + c + '">' + c + '</button>';
       }).join("");
-      $("sjBody").innerHTML = buildSubjectTable(grade, cat);
+
+      // 2단계 세부 분류 (사회/과학)
+      var subs = subListFor(grade, cat);
+      if (subs) {
+        if (subs.indexOf(sub) === -1) sub = "전체";
+        $("sjSubs").innerHTML = subs.map(function (s) {
+          return '<button class="sch-tab' + (s === sub ? " on" : "") + '" data-s="' + s + '">' + s + '</button>';
+        }).join("");
+        $("sjSubs").hidden = false;
+      } else {
+        sub = "전체"; $("sjSubs").innerHTML = ""; $("sjSubs").hidden = true;
+      }
+
+      $("sjBody").innerHTML = buildSubjectTable(grade, cat, sub);
     }
 
     var note = isTeacher()
@@ -591,13 +640,17 @@
       + '<p class="tt-note">' + note + '</p>'
       + gradeTabsHtml("sjTabs", grades, grade)
       + '<div class="subj-cats" id="sjCats"></div>'
+      + '<div class="subj-cats subj-subs" id="sjSubs" hidden></div>'
       + '<div id="sjBody"></div>';
 
     document.querySelectorAll("#sjTabs .sch-tab").forEach(function (b) {
       b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
     });
     $("sjCats").addEventListener("click", function (e) {
-      var b = e.target.closest(".sch-tab"); if (!b) return; cat = b.dataset.c; paint();
+      var b = e.target.closest(".sch-tab"); if (!b) return; cat = b.dataset.c; sub = "전체"; paint();
+    });
+    $("sjSubs").addEventListener("click", function (e) {
+      var b = e.target.closest(".sch-tab"); if (!b) return; sub = b.dataset.s; paint();
     });
     paint();
   }
