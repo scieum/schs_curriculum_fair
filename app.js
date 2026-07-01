@@ -710,9 +710,10 @@
     fit.style.height = Math.ceil(tbl.offsetHeight * s) + "px";
   }
 
-  /* 편제표 후처리: '[택4]/[택6]' 선택 표시 셀을, 그 선택그룹(이수학점 단위) 행 수만큼
-     세로로 병합하고 강조색을 입힌다. 원본(window.CURRICULUM)은 그대로 두고 가공본을 캐시.
-       - 그룹 경계: pj-credit(이수학점) 셀이 있는 행 = 새 선택그룹 시작 / pj-sec = 새 구분 */
+  /* 편제표 후처리: '[택4]/[택6]' 선택 표시 셀을 제자리에서 강조(색·괄호 제거)한다.
+     원본(window.CURRICULUM)은 그대로 두고 가공본을 캐시.
+       ※ 세로 병합은 선택 풀(최대 30여 행)이 커서 거대한 빈 색 밴드가 생기므로 하지 않음.
+         해당 학기 칸만 강조해 '택N'을 명확히 보여준다. */
   var _pjCache = {};
   function curriculumHtml(grade) {
     if (_pjCache[grade] != null) return _pjCache[grade];
@@ -720,53 +721,14 @@
     if (!raw) return (_pjCache[grade] = "");
     var div = document.createElement("div");
     div.innerHTML = raw;
-    var table = div.querySelector("table");
-    if (!table) return (_pjCache[grade] = raw);
-
-    // rowspan/colspan을 반영한 격자 좌표 매핑 (셀의 논리적 열 위치 파악용)
-    var rows = table.rows, grid = [];
-    for (var r = 0; r < rows.length; r++) {
-      var cells = rows[r].cells, c = 0;
-      grid[r] = grid[r] || [];
-      for (var i = 0; i < cells.length; i++) {
-        while (grid[r][c]) c++;
-        var cell = cells[i], rsp = cell.rowSpan || 1, csp = cell.colSpan || 1;
-        for (var dr = 0; dr < rsp; dr++) for (var dc = 0; dc < csp; dc++) {
-          grid[r + dr] = grid[r + dr] || [];
-          grid[r + dr][c + dc] = cell;
-        }
-        c += csp;
-      }
+    var cells = div.querySelectorAll("td.pj-sem");
+    for (var i = 0; i < cells.length; i++) {
+      var td = cells[i], txt = (td.textContent || "").trim();
+      if (txt.indexOf("택") === -1) continue;
+      td.className = (td.className + " pj-pick").replace(/\s+/g, " ").trim();
+      td.setAttribute("style", "background:#fbf1d5;color:#9a6b12;font-weight:800;");
+      td.innerHTML = '<span class="pj-pick-t">' + esc(txt.replace(/[\[\]]/g, "")) + '</span>';
     }
-    function colOf(r, cell) { var g = grid[r] || []; for (var x = 0; x < g.length; x++) if (g[x] === cell) return x; return -1; }
-    function boundary(r) { return !!(rows[r] && (rows[r].querySelector(".pj-credit") || rows[r].querySelector(".pj-sec"))); }
-
-    // 병합 계획을 먼저 세운 뒤 일괄 적용 (DOM 변경이 격자 계산에 영향 주지 않도록)
-    var plans = [];
-    for (var r2 = 0; r2 < rows.length; r2++) {
-      var tds = rows[r2].querySelectorAll("td.pj-sem");
-      for (var k = 0; k < tds.length; k++) {
-        var td = tds[k], txt = (td.textContent || "").trim();
-        if (txt.indexOf("택") === -1) continue;
-        var col = colOf(r2, td), remove = [];
-        for (var rr = r2 + 1; rr < rows.length; rr++) {
-          if (boundary(rr)) break;                              // 다음 선택그룹/구분 시작 → 종료
-          var below = (grid[rr] || [])[col];
-          if (!below || below.tagName !== "TD" || below.className.indexOf("pj-sem") === -1) break;
-          if ((below.textContent || "").indexOf("택") !== -1) break;  // 다음 '택N' 표시 전까지
-          remove.push(below);                                   // 그룹 내 같은 열(빈칸·부수 숫자) 흡수
-        }
-        plans.push({ td: td, span: 1 + remove.length, remove: remove, txt: txt });
-      }
-    }
-    plans.forEach(function (p) {
-      p.td.rowSpan = p.span;
-      p.td.className = (p.td.className + " pj-pick").replace(/\s+/g, " ").trim();
-      p.td.setAttribute("style", "background:#fbf1d5;color:#9a6b12;font-weight:800;");
-      p.td.innerHTML = '<span class="pj-pick-t">' + esc(p.txt.replace(/[\[\]]/g, "")) + '</span>';
-      p.remove.forEach(function (cc) { if (cc.parentNode) cc.parentNode.removeChild(cc); });
-    });
-
     return (_pjCache[grade] = div.innerHTML);
   }
 
