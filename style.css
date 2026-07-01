@@ -289,6 +289,10 @@ button{font-family:inherit;}
 .pj-note{white-space:normal;max-width:150px;font-size:10px;color:#8a7c55;text-align:left;line-height:1.35;}
 .pj-credit{background:#fbfdf9;font-weight:800;color:#2f4a1c;}
 .pj-table .e{color:#d8cdb0;}
+/* 학생선택 '택N' 표시 셀: 그룹 단위로 병합 + 강조색 */
+.pj-table td.pj-pick{background:#fbf1d5;color:#9a6b12;font-weight:800;
+  box-shadow:inset 0 0 0 1px #ecd7a0;}
+.pj-table td.pj-pick .pj-pick-t{display:inline-block;}
 .pj-total td{background:#eef3e8 !important;font-weight:800;color:#2f4a1c;}
 .pj-tag{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:800;}
 .t-gong{background:#e7eef9;color:#2c5aa0;}
@@ -496,4 +500,134 @@ button{font-family:inherit;}
 /* 아주 넓은 화면: 바로가기 더 넉넉하게 */
 @media (min-width:1280px){
   .device.is-pc #home .menu-grid{grid-template-columns:repeat(4,1fr);}
+}
+
+/* ===================================================================
+   진로 성향 검사 (홀랜드 RIASEC)
+   =================================================================== */
+/* 공통 버튼 */
+#detail .hl-btn{width:100%;padding:16px;border:0;border-radius:14px;font-family:inherit;
+  font-size:16px;font-weight:800;cursor:pointer;transition:transform .08s ease,opacity .15s ease;}
+#detail .hl-btn:active{transform:scale(.98);}
+#detail .hl-btn-go{background:#2f4a1c;color:#fff;box-shadow:0 8px 18px rgba(47,74,28,.22);margin-top:6px;}
+#detail .hl-btn-go:disabled{background:#c7cdbf;color:#eef0ea;box-shadow:none;cursor:default;}
+#detail .hl-btn-sub{background:#fff;color:#2f4a1c;border:1px solid #cde0b3;
+  box-shadow:0 4px 12px rgba(110,150,50,.10);}
+
+/* ── 소개 화면 ── */
+#detail .hl-hero{text-align:center;background:linear-gradient(165deg,#f6fbe2,#e4f2c6);
+  border:1px solid #dcebc2;border-radius:20px;padding:26px 20px 22px;margin-bottom:16px;
+  box-shadow:0 8px 20px rgba(110,150,50,.10);}
+#detail .hl-hero-emoji{font-size:40px;line-height:1;}
+#detail .hl-hero-t{font-size:21px;font-weight:800;color:#36511f;margin-top:8px;letter-spacing:-.3px;}
+#detail .hl-hero-s{font-size:13.5px;font-weight:600;color:#5e7a3a;margin-top:8px;line-height:1.55;}
+#detail .hl-tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:6px;}
+#detail .hl-tchip{display:flex;flex-direction:column;align-items:center;gap:3px;background:#fff;
+  border:1.5px solid #eee;border-radius:14px;padding:11px 6px;box-shadow:0 4px 12px rgba(120,100,60,.05);}
+#detail .hl-tchip-ic{display:inline-flex;align-items:center;justify-content:center;height:40px;}
+#detail .hl-tchip-img{width:40px;height:40px;object-fit:contain;}
+#detail .hl-tchip-emoji{font-size:22px;line-height:1.1;}
+#detail .hl-tchip-nm{font-size:13.5px;font-weight:800;}
+#detail .hl-tchip-en{font-size:9.5px;font-weight:700;color:#a3a3a3;letter-spacing:.3px;}
+
+/* ── 문항 화면 ── */
+#detail .hl-progress{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;
+  background:var(--white);padding:8px 0 12px;margin-bottom:4px;}
+#detail .hl-track{flex:1;height:9px;border-radius:6px;background:#eef0ea;overflow:hidden;}
+#detail .hl-fill{display:block;height:100%;width:0;border-radius:6px;
+  background:linear-gradient(90deg,#9cc56f,#4f7d24);transition:width .25s ease;}
+#detail .hl-progress-txt{flex:none;font-size:12px;font-weight:800;color:#4f7d24;min-width:52px;text-align:right;}
+#detail .hl-qs{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+#detail .hl-q{background:#fff;border:1px solid #f1ece0;border-radius:14px;padding:14px 15px;
+  box-shadow:0 4px 12px rgba(120,100,60,.05);transition:border-color .15s ease;}
+#detail .hl-q.done{border-color:#cde0b3;background:#fcfef8;}
+#detail .hl-q-t{display:flex;gap:8px;font-size:14.5px;font-weight:700;color:#2b2310;
+  line-height:1.5;letter-spacing:-.2px;margin-bottom:11px;}
+#detail .hl-q-no{flex:none;width:22px;height:22px;border-radius:50%;background:#eef0ea;color:#6e8a48;
+  font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;margin-top:1px;}
+#detail .hl-q.done .hl-q-no{background:#2f4a1c;color:#fff;}
+#detail .hl-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+#detail .hl-opt{padding:10px 4px;border:1px solid #e3e0d6;border-radius:10px;background:#fafaf7;
+  font-family:inherit;font-size:12px;font-weight:700;color:#7a7361;cursor:pointer;
+  word-break:keep-all;line-height:1.25;transition:all .12s ease;}
+#detail .hl-opt:active{transform:scale(.96);}
+#detail .hl-opt.on{background:#2f4a1c;border-color:#2f4a1c;color:#fff;box-shadow:0 4px 10px rgba(47,74,28,.2);}
+
+/* ── 결과 화면 ── */
+#detail .hl-result-head{text-align:center;background:linear-gradient(165deg,#eef7dc,#dcefbf);
+  border:1px solid #d3e7b3;border-radius:20px;padding:22px 18px;margin-bottom:14px;
+  box-shadow:0 8px 20px rgba(110,150,50,.12);}
+#detail .hl-result-ic{width:92px;height:92px;margin:0 auto 12px;border-radius:50%;background:#fff;
+  border:3px solid var(--tc);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 18px rgba(80,90,60,.14);}
+#detail .hl-result-img{width:66px;height:66px;object-fit:contain;}
+#detail .hl-code{font-size:42px;font-weight:900;color:#2f4a1c;letter-spacing:4px;line-height:1;}
+#detail .hl-code-sub{font-size:13px;font-weight:600;color:#5e7a3a;margin-top:10px;}
+#detail .hl-code-nm{font-size:22px;font-weight:800;color:#36511f;margin-top:3px;letter-spacing:-.3px;}
+
+#detail .hl-panel{background:#fff;border:1px solid #f1ece0;border-radius:16px;padding:16px;
+  margin-bottom:14px;box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .hl-panel-h{font-size:15px;font-weight:800;color:#2f4a1c;margin-bottom:12px;letter-spacing:-.2px;}
+#detail .hl-bars{display:flex;flex-direction:column;gap:11px;}
+#detail .hl-bar-row{display:flex;align-items:center;gap:9px;}
+#detail .hl-bar-lb{flex:none;width:64px;display:flex;align-items:center;gap:5px;}
+#detail .hl-bar-emoji{font-size:15px;}
+#detail .hl-bar-nm{font-size:13px;font-weight:800;}
+#detail .hl-bar-track{flex:1;height:12px;border-radius:7px;background:#f0f0ea;overflow:hidden;}
+#detail .hl-bar-fill{display:block;height:100%;border-radius:7px;min-width:3px;transition:width .5s ease;}
+#detail .hl-bar-val{flex:none;width:34px;text-align:right;font-size:13px;font-weight:800;color:#525252;}
+#detail .hl-bar-val::after{content:"점";font-size:9px;font-weight:700;color:#a3a3a3;margin-left:1px;}
+
+/* 대표/보조 유형 카드 */
+#detail .hl-type-card{background:#fff;border:1px solid #f1ece0;border-left:5px solid var(--tc);
+  border-radius:14px;padding:16px 16px 14px;margin-bottom:12px;box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .hl-type-h{display:flex;align-items:center;gap:12px;}
+#detail .hl-type-ic{flex:none;width:60px;height:60px;border-radius:16px;
+  background:color-mix(in srgb,var(--tc) 10%,#fff);border:1px solid color-mix(in srgb,var(--tc) 22%,#fff);
+  display:flex;align-items:center;justify-content:center;}
+#detail .hl-type-img{width:46px;height:46px;object-fit:contain;}
+#detail .hl-type-emoji{font-size:26px;}
+#detail .hl-type-htxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
+#detail .hl-type-badge{font-size:11px;font-weight:800;color:#fff;background:var(--tc);
+  border-radius:8px;padding:3px 9px;}
+#detail .hl-type-nmrow{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;}
+#detail .hl-type-nm{font-size:19px;font-weight:800;color:#2b2310;}
+#detail .hl-type-en{font-size:11px;font-weight:700;color:#a3a3a3;letter-spacing:.3px;}
+#detail .hl-type-desc{font-size:13.5px;font-weight:600;color:#525252;line-height:1.6;margin-top:10px;}
+#detail .hl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+#detail .hl-tag{font-size:11.5px;font-weight:700;color:var(--tc);background:#f4f2ec;
+  background:color-mix(in srgb,var(--tc) 12%,#fff);border-radius:8px;padding:4px 9px;}
+#detail .hl-jobs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;
+  padding-top:12px;border-top:1px solid #f4efe4;}
+#detail .hl-jobs-k{font-size:11.5px;font-weight:800;color:#8a7c55;margin-right:2px;}
+#detail .hl-job{font-size:12px;font-weight:700;color:#40352a;background:#f6f3ea;border-radius:8px;padding:4px 9px;}
+
+/* 추천 과목 리스트 */
+#detail .hl-rec-note{font-size:12.5px;font-weight:600;color:#8a7c55;margin:-6px 0 12px;line-height:1.5;}
+#detail .hl-recs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
+#detail .hl-rec{display:flex;gap:11px;align-items:flex-start;background:#fbfaf6;border:1px solid #f0ebdf;
+  border-radius:12px;padding:11px 12px;}
+#detail .hl-rec-rank{flex:none;width:24px;height:24px;border-radius:50%;background:#2f4a1c;color:#fff;
+  font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;margin-top:1px;}
+#detail .hl-rec:nth-child(n+4) .hl-rec-rank{background:#8aa16a;}
+#detail .hl-rec-body{flex:1;min-width:0;}
+#detail .hl-rec-top{display:flex;flex-wrap:wrap;align-items:center;gap:5px;}
+#detail .hl-rec-nm{font-size:14.5px;font-weight:800;color:#1f7a3d;letter-spacing:-.2px;margin-right:2px;}
+#detail .hl-rec-booth{font-size:10.5px;font-weight:800;color:#c47b1e;background:#fdeede;border-radius:8px;padding:3px 7px;}
+#detail .hl-rec-why{font-size:12px;font-weight:600;color:#7a7361;margin-top:5px;}
+
+#detail .hl-actions{margin-top:4px;}
+#detail .hl-disc{font-size:11.5px;color:#a3a3a3;font-weight:600;line-height:1.55;margin:14px 2px 4px;}
+
+/* PC: 유형 카드·추천을 2단으로 여유 있게 */
+@media (min-width:860px){
+  .device.is-pc #detail .hl-intro,
+  .device.is-pc #detail .hl-qs,
+  .device.is-pc #detail .hl-result-head,
+  .device.is-pc #detail .hl-panel,
+  .device.is-pc #detail .hl-type-card,
+  .device.is-pc #detail .hl-actions,
+  .device.is-pc #detail .hl-btn{max-width:720px;margin-left:auto;margin-right:auto;}
+  .device.is-pc #detail .hl-btn{display:block;}
+  .device.is-pc #detail .hl-tgrid{grid-template-columns:repeat(6,1fr);}
 }

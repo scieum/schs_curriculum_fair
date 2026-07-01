@@ -7,7 +7,8 @@
   var KEY = {
     grade: "sokcho_grade_v1",
     name:  "sokcho_nick_v1",
-    hak:   "sokcho_stu_v1"
+    hak:   "sokcho_stu_v1",
+    holland: "sokcho_holland_v1"
   };
 
   // 박람회 당일 (D-day 기준)
@@ -252,6 +253,7 @@
       hS.textContent = "내가 선택한 과목 한눈에";
       menu += menuCard("survey", "pen.png", "1차 수요조사 결과", "학기별 신청 과목");
       menu += menuCard("recommend", "compass.png", "선택과목 추천", "나에게 맞는 과목 찾기");
+      menu += menuCard("holland", "graph.png", "진로 성향 검사", "홀랜드 검사 + 과목 추천");
       menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
       menu += menuCard("metaverse", "Metaverse.png", "메타버스 박람회", "가상 공간 입장");
       menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
@@ -270,7 +272,8 @@
     schedule:   "전체 일정 확인",
     subjects:   "교과별 부스 배치",
     duty:       "임장 일정",
-    myclass:    "우리반 학생 위치"
+    myclass:    "우리반 학생 위치",
+    holland:    "진로 성향 검사"
   };
   // 외부 링크로 바로 연결되는 메뉴
   var LINKS = {
@@ -308,6 +311,7 @@
     else if (key === "curriculum") renderCurriculum();
     else if (key === "duty") renderDuty();
     else if (key === "myclass") renderMyClass();
+    else if (key === "holland") renderHolland();
     else renderSoon();
     show("detail");
   }
@@ -706,18 +710,106 @@
     fit.style.height = Math.ceil(tbl.offsetHeight * s) + "px";
   }
 
+  /* 편제표 후처리: '[택4]/[택6]' 선택 표시 셀을, 그 선택그룹(이수학점 단위) 행 수만큼
+     세로로 병합하고 강조색을 입힌다. 원본(window.CURRICULUM)은 그대로 두고 가공본을 캐시.
+       - 그룹 경계: pj-credit(이수학점) 셀이 있는 행 = 새 선택그룹 시작 / pj-sec = 새 구분 */
+  var _pjCache = {};
+  function curriculumHtml(grade) {
+    if (_pjCache[grade] != null) return _pjCache[grade];
+    var raw = (window.CURRICULUM || {})[grade] || "";
+    if (!raw) return (_pjCache[grade] = "");
+    var div = document.createElement("div");
+    div.innerHTML = raw;
+    var table = div.querySelector("table");
+    if (!table) return (_pjCache[grade] = raw);
+
+    // rowspan/colspan을 반영한 격자 좌표 매핑 (셀의 논리적 열 위치 파악용)
+    var rows = table.rows, grid = [];
+    for (var r = 0; r < rows.length; r++) {
+      var cells = rows[r].cells, c = 0;
+      grid[r] = grid[r] || [];
+      for (var i = 0; i < cells.length; i++) {
+        while (grid[r][c]) c++;
+        var cell = cells[i], rsp = cell.rowSpan || 1, csp = cell.colSpan || 1;
+        for (var dr = 0; dr < rsp; dr++) for (var dc = 0; dc < csp; dc++) {
+          grid[r + dr] = grid[r + dr] || [];
+          grid[r + dr][c + dc] = cell;
+        }
+        c += csp;
+      }
+    }
+    function colOf(r, cell) { var g = grid[r] || []; for (var x = 0; x < g.length; x++) if (g[x] === cell) return x; return -1; }
+    function boundary(r) { return !!(rows[r] && (rows[r].querySelector(".pj-credit") || rows[r].querySelector(".pj-sec"))); }
+
+    // 병합 계획을 먼저 세운 뒤 일괄 적용 (DOM 변경이 격자 계산에 영향 주지 않도록)
+    var plans = [];
+    for (var r2 = 0; r2 < rows.length; r2++) {
+      var tds = rows[r2].querySelectorAll("td.pj-sem");
+      for (var k = 0; k < tds.length; k++) {
+        var td = tds[k], txt = (td.textContent || "").trim();
+        if (txt.indexOf("택") === -1) continue;
+        var col = colOf(r2, td), remove = [];
+        for (var rr = r2 + 1; rr < rows.length; rr++) {
+          if (boundary(rr)) break;                              // 다음 선택그룹/구분 시작 → 종료
+          var below = (grid[rr] || [])[col];
+          if (!below || below.tagName !== "TD" || below.className.indexOf("pj-sem") === -1) break;
+          if ((below.textContent || "").indexOf("택") !== -1) break;  // 다음 '택N' 표시 전까지
+          remove.push(below);                                   // 그룹 내 같은 열(빈칸·부수 숫자) 흡수
+        }
+        plans.push({ td: td, span: 1 + remove.length, remove: remove, txt: txt });
+      }
+    }
+    plans.forEach(function (p) {
+      p.td.rowSpan = p.span;
+      p.td.className = (p.td.className + " pj-pick").replace(/\s+/g, " ").trim();
+      p.td.setAttribute("style", "background:#fbf1d5;color:#9a6b12;font-weight:800;");
+      p.td.innerHTML = '<span class="pj-pick-t">' + esc(p.txt.replace(/[\[\]]/g, "")) + '</span>';
+      p.remove.forEach(function (cc) { if (cc.parentNode) cc.parentNode.removeChild(cc); });
+    });
+
+    return (_pjCache[grade] = div.innerHTML);
+  }
+
+  // 편제표(복잡한 병합 표) → Excel(.xls) 다운로드.
+  //   HTML <table>를 그대로 담아 Excel이 rowspan/colspan 병합을 인식하게 함.
+  function downloadCurriculumXls(grade) {
+    var table = curriculumHtml(grade);
+    if (!table) return;
+    var year = (grade === "1") ? "2026" : "2025";
+    var title = "2026 속초고 교육과정 편제표 · " + grade + "학년(" + year + "학년도 입학생)";
+    var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+      + 'xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>'
+      + '<meta charset="utf-8">'
+      + '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
+      + '<x:Name>' + grade + '학년 편제표</x:Name>'
+      + '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>'
+      + '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->'
+      + '<style>table{border-collapse:collapse;}'
+      + 'th,td{border:.5pt solid #888;padding:3px 6px;font-family:"Malgun Gothic";'
+      + 'font-size:10pt;text-align:center;mso-number-format:"\\@";vertical-align:middle;}'
+      + 'th{background:#eef1f4;font-weight:bold;}</style></head>'
+      + '<body><h3>' + esc(title) + '</h3>' + table + '</body></html>';
+    var blob = new Blob(["﻿" + html], { type: "application/vnd.ms-excel;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "교육과정_편제표_" + grade + "학년.xls";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
   function renderCurriculum() {
     var data = window.CURRICULUM || null;
     if (!data) { renderSoon(); return; }
 
     var grades = viewGrades();
     var grade = grades[0];
+    var teacher = isTeacher();
     var mode = "fit";   // fit = 한눈에(자동 축소), scroll = 원본 크기
 
     function paint() {
       document.querySelectorAll("#pjModes .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.m === mode); });
       document.querySelectorAll("#pjTabs .sch-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.g === grade); });
-      var html = data[grade] || "";
+      var html = curriculumHtml(grade);
       if (mode === "fit") {
         $("pjBody").innerHTML = '<div class="pj-fit"><div class="pj-scale">' + html + '</div></div>';
         requestAnimationFrame(fitCurriculum);
@@ -731,7 +823,10 @@
       : '<b>' + grade + '학년 3개년 교육과정 편제표</b>예요. (' + (grade === "1" ? "2026" : "2025") + '학년도 입학생)';
 
     $("detailBody").innerHTML = ''
-      + '<p class="tt-note">' + pjNote + ' <b>한눈에 보기</b>는 화면에 맞춰 줄여 보여줘요.</p>'
+      + '<div class="ag-top">'
+      +   '<p class="tt-note ag-top-note">' + pjNote + ' <b>한눈에 보기</b>는 화면에 맞춰 줄여 보여줘요.</p>'
+      +   (teacher ? '<button class="mc-print ag-xlsx" id="pjXlsx"><img class="btn-ic" src="img/excel.png" alt="" aria-hidden="true">엑셀 다운로드</button>' : '')
+      + '</div>'
       + '<div class="sch-modes" id="pjModes">'
       +   '<button class="sch-tab" data-m="fit">한눈에 보기</button>'
       +   '<button class="sch-tab" data-m="scroll">원본 크기</button>'
@@ -739,6 +834,7 @@
       + gradeTabsHtml("pjTabs", grades, grade)
       + '<div id="pjBody"></div>';
 
+    if (teacher) $("pjXlsx").addEventListener("click", function () { downloadCurriculumXls(grade); });
     document.querySelectorAll("#pjModes .sch-tab").forEach(function (b) {
       b.addEventListener("click", function () { mode = b.dataset.m; paint(); });
     });
@@ -964,6 +1060,254 @@
       b.addEventListener("click", function () { grade = b.dataset.g; paint(); });
     });
     paint();
+  }
+
+  /* ---------- 진로 성향 검사 (홀랜드 RIASEC) + 과목 추천 ----------
+     data_holland.js → window.HOLLAND (유형·문항·과목 매핑).
+     흐름: 소개 → 24문항 → 결과(6유형 그래프 + 대표유형) → 나에게 맞는 과목 추천.
+     결과는 KEY.holland(localStorage)에 저장하여 재방문 시 바로 표시. */
+  var HL_ORDER = ["R", "I", "A", "S", "E", "C"];
+  var HL_ANS = ["전혀 아니다", "아니다", "그렇다", "매우 그렇다"];
+  var HL_MAX = 12;   // 유형별 4문항 × 3점
+
+  // 추천 대상 학년(학생=본인 학년, 게스트/미상=1학년)
+  function hlGrade() {
+    var g = localStorage.getItem(KEY.grade) || "";
+    return (g === "1" || g === "2") ? g : "1";
+  }
+  function hlZero() { return { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 }; }
+
+  // 응답 → 유형별 점수
+  function hlScores(answers) {
+    var qs = (window.HOLLAND || {}).questions || [], s = hlZero();
+    qs.forEach(function (q, i) { s[q.t] += (answers[i] > 0 ? answers[i] : 0); });
+    return s;
+  }
+  // 유형 정렬(점수 내림차순, 동점은 RIASEC 순)
+  function hlRankTypes(scores) {
+    return HL_ORDER.slice().sort(function (a, b) {
+      if (scores[b] !== scores[a]) return scores[b] - scores[a];
+      return HL_ORDER.indexOf(a) - HL_ORDER.indexOf(b);
+    });
+  }
+  // 과목명 → 성향 벡터(교과 기본 + 키워드 보정)
+  function hlSubjectVec(name, meta) {
+    var H = window.HOLLAND || {}, base = (H.deptVec || {})[meta.dept] || {}, v = hlZero();
+    for (var k in base) v[k] += base[k];
+    (H.rules || []).forEach(function (rule) {
+      if (rule.re.test(name)) for (var kk in rule.vec) v[kk] += rule.vec[kk];
+    });
+    return v;
+  }
+  // 학생 성향(pref) 기준으로 학년 선택과목을 코사인 유사도로 정렬해 상위 N개 추천
+  function hlRecommend(grade, pref, topN) {
+    var META = (window.SUBJECT_META || {})[grade] || {};
+    var ROOMS = (grade === "2" ? window.ROOMS_G2 : window.ROOMS_G1) || {};
+    var boothKeys = Object.keys(ROOMS);
+    var kindRank = { "진로": 0, "융합": 1, "일반": 2 };
+    var out = [];
+    for (var name in META) {
+      var m = META[name];
+      if (!m || m.kind === "공통") continue;   // 공통(필수)과목 제외 → 선택과목만 추천
+      var v = hlSubjectVec(name, m), dot = 0, mag = 0;
+      HL_ORDER.forEach(function (t) { dot += (pref[t] || 0) * (v[t] || 0); mag += (v[t] || 0) * (v[t] || 0); });
+      var score = dot / (Math.sqrt(mag) || 1);
+      var booth = null;
+      for (var bi = 0; bi < boothKeys.length; bi++) {
+        if (boothKeys[bi].indexOf(name) !== -1) { booth = boothKeys[bi]; break; }
+      }
+      out.push({ name: name, dept: m.dept, kind: m.kind, vec: v, score: score, booth: booth });
+    }
+    out.sort(function (a, b) {
+      if (Math.abs(b.score - a.score) > 1e-9) return b.score - a.score;
+      var ra = kindRank[a.kind], rb = kindRank[b.kind];
+      ra = (ra == null ? 3 : ra); rb = (rb == null ? 3 : rb);
+      if (ra !== rb) return ra - rb;
+      return a.name.localeCompare(b.name, "ko");
+    });
+    return out.slice(0, topN || 8);
+  }
+  // 추천 사유: 학생 상위 유형 중 이 과목이 지닌 성향 1~2개를 문구로
+  function hlReason(item, topTypes) {
+    var H = window.HOLLAND || {};
+    var hits = topTypes.filter(function (t) { return (item.vec[t] || 0) > 0; });
+    hits.sort(function (a, b) { return (item.vec[b] || 0) - (item.vec[a] || 0); });
+    hits = hits.slice(0, 2);
+    if (!hits.length) hits = [hlRankTypes(item.vec)[0]];
+    var names = hits.map(function (t) { return (H.types[t] || {}).name || t; });
+    return names.join("·") + " 성향과 잘 맞아요";
+  }
+
+  function renderHolland() {
+    if (!window.HOLLAND) { renderSoon(); return; }
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY.holland) || "null"); } catch (e) {}
+    if (saved && saved.scores) hlShowResult(saved.scores);
+    else hlShowIntro();
+  }
+
+  // 1) 소개 화면
+  function hlShowIntro() {
+    var H = window.HOLLAND, T = H.types;
+    var chips = HL_ORDER.map(function (t) {
+      var ty = T[t];
+      return '<div class="hl-tchip" style="border-color:' + ty.color + '33">'
+        + '<span class="hl-tchip-ic">'
+        +   '<img class="hl-tchip-img" src="' + ty.img + '" alt="" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'inline\'">'
+        +   '<span class="hl-tchip-emoji" style="display:none">' + ty.emoji + '</span></span>'
+        + '<span class="hl-tchip-nm" style="color:' + ty.color + '">' + esc(ty.name) + '</span>'
+        + '<span class="hl-tchip-en">' + esc(ty.tag) + '</span></div>';
+    }).join("");
+    $("detailBody").innerHTML = ''
+      + '<div class="hl-intro">'
+      +   '<div class="hl-hero">'
+      +     '<div class="hl-hero-emoji"><img class="hl-hero-img" src="img/compass.png" alt="" onerror="this.parentNode.textContent=\'🧭\'"></div>'
+      +     '<div class="hl-hero-t">나의 진로 성향 검사</div>'
+      +     '<div class="hl-hero-s">홀랜드(RIASEC) 검사로 나의 흥미 유형을 알아보고,<br>속초고 과목 중 <b>나에게 맞는 선택과목</b>을 추천받아요.</div>'
+      +   '</div>'
+      +   '<div class="hl-tgrid">' + chips + '</div>'
+      +   '<p class="tt-note">총 <b>24문항</b> · 약 2분이면 끝나요. 솔직하게 답할수록 정확해요!</p>'
+      +   '<button class="hl-btn hl-btn-go" id="hlStart">검사 시작하기 ▶</button>'
+      + '</div>';
+    $("hlStart").addEventListener("click", hlShowTest);
+  }
+
+  // 2) 문항 화면
+  function hlShowTest() {
+    var H = window.HOLLAND, qs = H.questions;
+    var answers = qs.map(function () { return -1; });
+
+    var cards = qs.map(function (q, i) {
+      var opts = HL_ANS.map(function (label, v) {
+        return '<button type="button" class="hl-opt" data-q="' + i + '" data-v="' + v + '">' + esc(label) + '</button>';
+      }).join("");
+      return '<div class="hl-q" id="hlq' + i + '">'
+        + '<div class="hl-q-t"><span class="hl-q-no">' + (i + 1) + '</span>' + esc(q.q) + '</div>'
+        + '<div class="hl-opts">' + opts + '</div></div>';
+    }).join("");
+
+    $("detailBody").innerHTML = ''
+      + '<p class="tt-note">각 문항이 <b>나와 얼마나 비슷한지</b> 골라주세요.</p>'
+      + '<div class="hl-progress"><div class="hl-track"><span class="hl-fill" id="hlBar"></span></div>'
+      +   '<span class="hl-progress-txt" id="hlPct">0 / ' + qs.length + '</span></div>'
+      + '<div class="hl-qs" id="hlQs">' + cards + '</div>'
+      + '<button class="hl-btn hl-btn-go" id="hlSubmit" disabled>결과 보기</button>';
+
+    function answered() { var n = 0; answers.forEach(function (a) { if (a >= 0) n++; }); return n; }
+    function refresh() {
+      var n = answered();
+      $("hlBar").style.width = Math.round(n / qs.length * 100) + "%";
+      $("hlPct").textContent = n + " / " + qs.length;
+      $("hlSubmit").disabled = (n < qs.length);
+    }
+    $("hlQs").addEventListener("click", function (e) {
+      var b = e.target.closest(".hl-opt"); if (!b) return;
+      var qi = +b.dataset.q, v = +b.dataset.v;
+      answers[qi] = v;
+      var card = $("hlq" + qi);
+      card.querySelectorAll(".hl-opt").forEach(function (o) { o.classList.toggle("on", +o.dataset.v === v); });
+      card.classList.add("done");
+      refresh();
+    });
+    $("hlSubmit").addEventListener("click", function () {
+      if (answered() < qs.length) return;
+      var scores = hlScores(answers);
+      try { localStorage.setItem(KEY.holland, JSON.stringify({ scores: scores, ts: Date.now() })); } catch (e) {}
+      hlShowResult(scores);
+    });
+    var body = $("detail"); if (body) body.scrollTop = 0;
+    if (window.scrollTo) window.scrollTo(0, 0);
+  }
+
+  // 3) 결과 화면
+  function hlShowResult(scores) {
+    var H = window.HOLLAND, T = H.types;
+    var name = localStorage.getItem(KEY.name) || "속초고 학생";
+    var grade = hlGrade();
+    var rank = hlRankTypes(scores);
+    var top3 = rank.slice(0, 3);
+    var code = top3.join("");
+    var topName = top3.map(function (t) { return T[t].name; }).join("·");
+    var maxScore = Math.max(1, scores[rank[0]]);
+
+    // 6유형 막대 그래프
+    var bars = rank.map(function (t) {
+      var ty = T[t], w = Math.round(scores[t] / maxScore * 100);
+      var pct = Math.round(scores[t] / HL_MAX * 100);
+      return '<div class="hl-bar-row">'
+        + '<div class="hl-bar-lb"><span class="hl-bar-emoji">' + ty.emoji + '</span>'
+        +   '<span class="hl-bar-nm" style="color:' + ty.color + '">' + esc(ty.name) + '</span></div>'
+        + '<div class="hl-bar-track"><span class="hl-bar-fill" style="width:' + w + '%;background:' + ty.color + '"></span></div>'
+        + '<div class="hl-bar-val">' + pct + '</div></div>';
+    }).join("");
+
+    // 대표 유형(1·2위) 상세 카드
+    var detailCards = top3.slice(0, 2).map(function (t, idx) {
+      var ty = T[t];
+      return '<div class="hl-type-card" style="--tc:' + ty.color + '">'
+        + '<div class="hl-type-h">'
+        +   '<span class="hl-type-ic"><img class="hl-type-img" src="' + ty.img + '" alt="" '
+        +     'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
+        +     '<span class="hl-type-emoji" style="display:none">' + ty.emoji + '</span></span>'
+        +   '<div class="hl-type-htxt">'
+        +     '<span class="hl-type-badge">' + (idx === 0 ? "대표 유형" : "보조 유형") + '</span>'
+        +     '<div class="hl-type-nmrow"><span class="hl-type-nm">' + esc(ty.name) + '</span>'
+        +       '<span class="hl-type-en">' + esc(ty.tag) + '</span></div>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="hl-type-desc">' + esc(ty.desc) + '</div>'
+        + '<div class="hl-tags">' + ty.traits.map(function (x) { return '<span class="hl-tag">#' + esc(x) + '</span>'; }).join("") + '</div>'
+        + '<div class="hl-jobs"><span class="hl-jobs-k">어울리는 진로</span>'
+        +   ty.jobs.map(function (j) { return '<span class="hl-job">' + esc(j) + '</span>'; }).join("") + '</div>'
+        + '</div>';
+    }).join("");
+
+    // 성향 벡터(0~1)로 추천
+    var pref = hlZero();
+    HL_ORDER.forEach(function (t) { pref[t] = scores[t] / HL_MAX; });
+    var recs = hlRecommend(grade, pref, 8);
+    var kindCls = { "일반": "k-ilban", "진로": "k-jinro", "융합": "k-yung", "공통": "k-gong" };
+    var recHtml = recs.map(function (it, i) {
+      var kc = kindCls[it.kind] || "";
+      return '<li class="hl-rec">'
+        + '<span class="hl-rec-rank">' + (i + 1) + '</span>'
+        + '<div class="hl-rec-body">'
+        +   '<div class="hl-rec-top"><span class="hl-rec-nm">' + esc(it.name) + '</span>'
+        +     '<span class="sv-dept">' + esc(it.dept) + '</span>'
+        +     '<span class="sv-kind ' + kc + '">' + esc(it.kind) + '</span>'
+        +     (it.booth ? '<span class="hl-rec-booth">🎪 박람회 부스</span>' : '') + '</div>'
+        +   '<div class="hl-rec-why">' + esc(hlReason(it, top3)) + '</div>'
+        + '</div></li>';
+    }).join("");
+
+    $("detailBody").innerHTML = ''
+      + '<div class="hl-result-head">'
+      +   '<div class="hl-result-ic" style="--tc:' + T[top3[0]].color + '">'
+      +     '<img class="hl-result-img" src="' + T[top3[0]].img + '" alt="" onerror="this.style.display=\'none\'">'
+      +   '</div>'
+      +   '<div class="hl-code">' + esc(code) + '</div>'
+      +   '<div class="hl-code-sub"><b>' + esc(name) + honorific(name) + '</b>의 진로 성향은</div>'
+      +   '<div class="hl-code-nm">' + esc(topName) + '</div>'
+      + '</div>'
+      + '<div class="hl-panel"><div class="hl-panel-h">유형별 성향 점수</div>'
+      +   '<div class="hl-bars">' + bars + '</div></div>'
+      + detailCards
+      + '<div class="hl-panel">'
+      +   '<div class="hl-panel-h">🎯 나에게 맞는 <b>' + grade + '학년 선택과목</b> 추천</div>'
+      +   '<p class="hl-rec-note">내 흥미 유형과 잘 맞는 과목이에요. 박람회에서 직접 확인해 보세요!</p>'
+      +   '<ul class="hl-recs">' + recHtml + '</ul>'
+      + '</div>'
+      + '<div class="hl-actions">'
+      +   '<button class="hl-btn hl-btn-sub" id="hlRetry">다시 검사하기</button>'
+      + '</div>'
+      + '<p class="hl-disc">※ 이 검사는 진로 탐색을 돕기 위한 참고용이에요. 최종 과목 선택은 담임·교과 선생님과 상담해 결정하세요.</p>';
+
+    $("hlRetry").addEventListener("click", function () {
+      try { localStorage.removeItem(KEY.holland); } catch (e) {}
+      hlShowTest();
+    });
+    var body = $("detail"); if (body) body.scrollTop = 0;
+    if (window.scrollTo) window.scrollTo(0, 0);
   }
 
   /* ---------- (교사) 임장 일정 ----------
