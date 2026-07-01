@@ -1070,6 +1070,14 @@
   var HL_ANS = ["전혀 아니다", "아니다", "그렇다", "매우 그렇다"];
   var HL_MAX = 12;   // 유형별 4문항 × 3점
 
+  // 막대 그래프 단일색(초록) 명암: 점수 높을수록 진하게 (t: 0=연함 ~ 1=진함)
+  function hlShade(t) {
+    t = Math.max(0, Math.min(1, t));
+    var a = [205, 227, 175], b = [45, 92, 26];   // 연한 초록 → 진한 초록
+    return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * t) + ','
+      + Math.round(a[1] + (b[1] - a[1]) * t) + ',' + Math.round(a[2] + (b[2] - a[2]) * t) + ')';
+  }
+
   // 추천 대상 학년(학생=본인 학년, 게스트/미상=1학년)
   function hlGrade() {
     var g = localStorage.getItem(KEY.grade) || "";
@@ -1234,10 +1242,11 @@
     var bars = rank.map(function (t) {
       var ty = T[t], w = Math.round(scores[t] / maxScore * 100);
       var pct = Math.round(scores[t] / HL_MAX * 100);
+      var col = hlShade(0.28 + 0.72 * (scores[t] / maxScore));   // 단일 초록, 점수순 명암
       return '<div class="hl-bar-row">'
         + '<div class="hl-bar-lb"><img class="hl-bar-ic" src="' + ty.img + '" alt="" onerror="this.style.display=\'none\'">'
-        +   '<span class="hl-bar-nm" style="color:' + ty.color + '">' + esc(ty.name) + '</span></div>'
-        + '<div class="hl-bar-track"><span class="hl-bar-fill" style="width:' + w + '%;background:' + ty.color + '"></span></div>'
+        +   '<span class="hl-bar-nm">' + esc(ty.name) + '</span></div>'
+        + '<div class="hl-bar-track"><span class="hl-bar-fill" style="width:' + w + '%;background:' + col + '"></span></div>'
         + '<div class="hl-bar-val">' + pct + '</div></div>';
     }).join("");
 
@@ -1293,7 +1302,7 @@
       +   '<div class="hl-bars">' + bars + '</div></div>'
       + detailCards
       + '<div class="hl-panel">'
-      +   '<div class="hl-panel-h">🎯 나에게 맞는 <b>' + grade + '학년 선택과목</b> 추천</div>'
+      +   '<div class="hl-panel-h"><img class="hl-panel-ic" src="img/target.png" alt="" onerror="this.style.display=\'none\'">나에게 맞는 <b>' + grade + '학년 선택과목</b> 추천</div>'
       +   '<p class="hl-rec-note">내 흥미 유형과 잘 맞는 과목이에요. 박람회에서 직접 확인해 보세요!</p>'
       +   '<ul class="hl-recs">' + recHtml + '</ul>'
       + '</div>'

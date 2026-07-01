@@ -570,12 +570,13 @@ button{font-family:inherit;}
 #detail .hl-panel{background:#fff;border:1px solid #f1ece0;border-radius:16px;padding:16px;
   margin-bottom:14px;box-shadow:0 6px 16px rgba(120,100,60,.06);}
 #detail .hl-panel-h{font-size:15px;font-weight:800;color:#2f4a1c;margin-bottom:12px;letter-spacing:-.2px;}
+#detail .hl-panel-ic{width:22px;height:22px;object-fit:contain;vertical-align:-5px;margin-right:5px;}
 #detail .hl-bars{display:flex;flex-direction:column;gap:11px;}
 #detail .hl-bar-row{display:flex;align-items:center;gap:9px;}
 #detail .hl-bar-lb{flex:none;width:66px;display:flex;align-items:center;gap:5px;}
 #detail .hl-bar-ic{width:22px;height:22px;object-fit:contain;flex:none;}
 #detail .hl-bar-emoji{font-size:15px;}
-#detail .hl-bar-nm{font-size:13px;font-weight:800;}
+#detail .hl-bar-nm{font-size:13px;font-weight:800;color:#3d4a2c;}
 #detail .hl-bar-track{flex:1;height:12px;border-radius:7px;background:#f0f0ea;overflow:hidden;}
 #detail .hl-bar-fill{display:block;height:100%;border-radius:7px;min-width:3px;transition:width .5s ease;}
 #detail .hl-bar-val{flex:none;width:34px;text-align:right;font-size:13px;font-weight:800;color:#525252;}
