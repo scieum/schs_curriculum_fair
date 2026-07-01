@@ -519,6 +519,8 @@ button{font-family:inherit;}
   border:1px solid #dcebc2;border-radius:20px;padding:26px 20px 22px;margin-bottom:16px;
   box-shadow:0 8px 20px rgba(110,150,50,.10);}
 #detail .hl-hero-emoji{font-size:40px;line-height:1;}
+#detail .hl-hero-img{width:64px;height:64px;object-fit:contain;
+  filter:drop-shadow(0 6px 10px rgba(90,120,40,.22));}
 #detail .hl-hero-t{font-size:21px;font-weight:800;color:#36511f;margin-top:8px;letter-spacing:-.3px;}
 #detail .hl-hero-s{font-size:13.5px;font-weight:600;color:#5e7a3a;margin-top:8px;line-height:1.55;}
 #detail .hl-tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:6px;}
