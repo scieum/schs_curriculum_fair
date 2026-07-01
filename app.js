@@ -1235,7 +1235,7 @@
       var ty = T[t], w = Math.round(scores[t] / maxScore * 100);
       var pct = Math.round(scores[t] / HL_MAX * 100);
       return '<div class="hl-bar-row">'
-        + '<div class="hl-bar-lb"><span class="hl-bar-emoji">' + ty.emoji + '</span>'
+        + '<div class="hl-bar-lb"><img class="hl-bar-ic" src="' + ty.img + '" alt="" onerror="this.style.display=\'none\'">'
         +   '<span class="hl-bar-nm" style="color:' + ty.color + '">' + esc(ty.name) + '</span></div>'
         + '<div class="hl-bar-track"><span class="hl-bar-fill" style="width:' + w + '%;background:' + ty.color + '"></span></div>'
         + '<div class="hl-bar-val">' + pct + '</div></div>';
@@ -1244,13 +1244,13 @@
     // 대표 유형(1·2위) 상세 카드
     var detailCards = top3.slice(0, 2).map(function (t, idx) {
       var ty = T[t];
-      return '<div class="hl-type-card" style="--tc:' + ty.color + '">'
+      return '<div class="hl-type-card">'
         + '<div class="hl-type-h">'
         +   '<span class="hl-type-ic"><img class="hl-type-img" src="' + ty.img + '" alt="" '
         +     'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
         +     '<span class="hl-type-emoji" style="display:none">' + ty.emoji + '</span></span>'
         +   '<div class="hl-type-htxt">'
-        +     '<span class="hl-type-badge">' + (idx === 0 ? "대표 유형" : "보조 유형") + '</span>'
+        +     '<span class="hl-type-badge' + (idx === 0 ? ' on' : '') + '">' + (idx === 0 ? "대표 유형" : "보조 유형") + '</span>'
         +     '<div class="hl-type-nmrow"><span class="hl-type-nm">' + esc(ty.name) + '</span>'
         +       '<span class="hl-type-en">' + esc(ty.tag) + '</span></div>'
         +   '</div>'
@@ -1282,7 +1282,7 @@
 
     $("detailBody").innerHTML = ''
       + '<div class="hl-result-head">'
-      +   '<div class="hl-result-ic" style="--tc:' + T[top3[0]].color + '">'
+      +   '<div class="hl-result-ic">'
       +     '<img class="hl-result-img" src="' + T[top3[0]].img + '" alt="" onerror="this.style.display=\'none\'">'
       +   '</div>'
       +   '<div class="hl-code">' + esc(code) + '</div>'

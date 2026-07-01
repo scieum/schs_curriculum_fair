@@ -559,9 +559,9 @@ button{font-family:inherit;}
 #detail .hl-result-head{text-align:center;background:linear-gradient(165deg,#eef7dc,#dcefbf);
   border:1px solid #d3e7b3;border-radius:20px;padding:22px 18px;margin-bottom:14px;
   box-shadow:0 8px 20px rgba(110,150,50,.12);}
-#detail .hl-result-ic{width:92px;height:92px;margin:0 auto 12px;border-radius:50%;background:#fff;
-  border:3px solid var(--tc);display:flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 18px rgba(80,90,60,.14);}
+#detail .hl-result-ic{width:96px;height:96px;margin:0 auto 12px;border-radius:50%;background:#fff;
+  border:1px solid #eadfc6;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 22px rgba(80,90,60,.16);}
 #detail .hl-result-img{width:66px;height:66px;object-fit:contain;}
 #detail .hl-code{font-size:42px;font-weight:900;color:#2f4a1c;letter-spacing:4px;line-height:1;}
 #detail .hl-code-sub{font-size:13px;font-weight:600;color:#5e7a3a;margin-top:10px;}
@@ -572,7 +572,8 @@ button{font-family:inherit;}
 #detail .hl-panel-h{font-size:15px;font-weight:800;color:#2f4a1c;margin-bottom:12px;letter-spacing:-.2px;}
 #detail .hl-bars{display:flex;flex-direction:column;gap:11px;}
 #detail .hl-bar-row{display:flex;align-items:center;gap:9px;}
-#detail .hl-bar-lb{flex:none;width:64px;display:flex;align-items:center;gap:5px;}
+#detail .hl-bar-lb{flex:none;width:66px;display:flex;align-items:center;gap:5px;}
+#detail .hl-bar-ic{width:22px;height:22px;object-fit:contain;flex:none;}
 #detail .hl-bar-emoji{font-size:15px;}
 #detail .hl-bar-nm{font-size:13px;font-weight:800;}
 #detail .hl-bar-track{flex:1;height:12px;border-radius:7px;background:#f0f0ea;overflow:hidden;}
@@ -580,25 +581,25 @@ button{font-family:inherit;}
 #detail .hl-bar-val{flex:none;width:34px;text-align:right;font-size:13px;font-weight:800;color:#525252;}
 #detail .hl-bar-val::after{content:"점";font-size:9px;font-weight:700;color:#a3a3a3;margin-left:1px;}
 
-/* 대표/보조 유형 카드 */
-#detail .hl-type-card{background:#fff;border:1px solid #f1ece0;border-left:5px solid var(--tc);
-  border-radius:14px;padding:16px 16px 14px;margin-bottom:12px;box-shadow:0 6px 16px rgba(120,100,60,.06);}
-#detail .hl-type-h{display:flex;align-items:center;gap:12px;}
-#detail .hl-type-ic{flex:none;width:60px;height:60px;border-radius:16px;
-  background:color-mix(in srgb,var(--tc) 10%,#fff);border:1px solid color-mix(in srgb,var(--tc) 22%,#fff);
-  display:flex;align-items:center;justify-content:center;}
-#detail .hl-type-img{width:46px;height:46px;object-fit:contain;}
+/* 대표/보조 유형 카드 — 앱 공통 베이지/초록 톤 (유형색은 이미지로만) */
+#detail .hl-type-card{background:#fff;border:1px solid #f1ece0;
+  border-radius:16px;padding:18px 17px 15px;margin-bottom:12px;box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .hl-type-h{display:flex;align-items:center;gap:13px;}
+#detail .hl-type-ic{flex:none;width:60px;height:60px;border-radius:50%;
+  background:#f7f4ec;border:1px solid #eee6d6;display:flex;align-items:center;justify-content:center;}
+#detail .hl-type-img{width:44px;height:44px;object-fit:contain;}
 #detail .hl-type-emoji{font-size:26px;}
-#detail .hl-type-htxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
-#detail .hl-type-badge{font-size:11px;font-weight:800;color:#fff;background:var(--tc);
-  border-radius:8px;padding:3px 9px;}
+#detail .hl-type-htxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;align-items:flex-start;}
+#detail .hl-type-badge{font-size:11px;font-weight:800;color:#8a7c55;background:#f0ebdf;
+  border-radius:999px;padding:3px 10px;}
+#detail .hl-type-badge.on{color:#fff;background:#2f4a1c;}
 #detail .hl-type-nmrow{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;}
 #detail .hl-type-nm{font-size:19px;font-weight:800;color:#2b2310;}
 #detail .hl-type-en{font-size:11px;font-weight:700;color:#a3a3a3;letter-spacing:.3px;}
 #detail .hl-type-desc{font-size:13.5px;font-weight:600;color:#525252;line-height:1.6;margin-top:10px;}
-#detail .hl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
-#detail .hl-tag{font-size:11.5px;font-weight:700;color:var(--tc);background:#f4f2ec;
-  background:color-mix(in srgb,var(--tc) 12%,#fff);border-radius:8px;padding:4px 9px;}
+#detail .hl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+#detail .hl-tag{font-size:11.5px;font-weight:700;color:#6b5526;background:#f3efe3;
+  border-radius:8px;padding:4px 10px;}
 #detail .hl-jobs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;
   padding-top:12px;border-top:1px solid #f4efe4;}
 #detail .hl-jobs-k{font-size:11.5px;font-weight:800;color:#8a7c55;margin-right:2px;}
